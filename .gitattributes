@@ -1,0 +1,14 @@
+# Normalise line endings so the repo stores LF regardless of contributor OS.
+# Without this, a Windows checkout commits CRLF and every file shows as fully
+# modified when anyone opens the project on macOS or Linux — phantom diffs that
+# make a real code review impossible to read.
+* text=auto eol=lf
+
+# Binary files must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.pdf binary
+*.woff binary
+*.woff2 binary

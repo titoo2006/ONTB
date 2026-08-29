@@ -1,0 +1,31 @@
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Secrets — SECURITY.md §7
+# Ignore EVERY .env variant, then re-admit the committed template. `.env*.local`
+# alone missed .env.production / .env.development — which is precisely where the
+# Paymob secret key and the Supabase service role key would end up.
+.env
+.env*
+!.env.example
+
+# Credentials and keys of any kind
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Supabase CLI local state (can contain project refs and access tokens)
+.supabase/
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+
+.DS_Store
+*.log
+.vercel

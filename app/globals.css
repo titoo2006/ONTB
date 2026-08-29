@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * DESIGN.md §1 — the single source of truth for color in this codebase.
+ * Components reference Tailwind tokens (which point at these variables),
+ * never a raw hex value (DESIGN.md §8).
+ */
+:root {
+  /* Primary */
+  --color-primary: #0b3b5c;
+  --color-primary-light: #155e8a;
+  --color-accent: #c89b3c;
+
+  /* Background */
+  --color-bg: #faf7f1;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1ece0;
+
+  /* Text */
+  --color-text-primary: #1a2b33;
+  --color-text-secondary: #5b6b72;
+  --color-text-muted: #8b979c;
+  --color-text-on-primary: #ffffff;
+  --color-text-on-accent: #1a2b33;
+
+  /* Status */
+  --color-success: #1e7a4c;
+  --color-warning: #b8792a;
+  --color-danger: #b23a3a;
+
+  /* DESIGN.md §1 — status badge backgrounds are a ~10% tint, never the full color */
+  --color-success-tint: rgb(30 122 76 / 0.1);
+  --color-warning-tint: rgb(184 121 42 / 0.1);
+  --color-danger-tint: rgb(178 58 58 / 0.1);
+
+  /* Border & divider */
+  --color-border: #e4ddcc;
+  --color-border-strong: #c9bfa5;
+
+  /* Typography families — assigned by next/font in app/layout.tsx */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* DESIGN.md §2 — booking codes must never wrap and must stay large and legible. */
+.booking-code {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  white-space: nowrap;
+}

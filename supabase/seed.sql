@@ -35,13 +35,22 @@ where not exists (select 1 from public.fx_rates);
 -- image_url is left null: no yacht photography exists yet (context.md §9), so
 -- trip cards render the treated placeholder.
 
-insert into public.yachts (name, capacity, image_url, active)
-select 'Nile Empress', 500, null, true   -- PLACEHOLDER name / PLACEHOLDER capacity
-where not exists (select 1 from public.yachts where name = 'Nile Empress');
+-- Real vessel names, confirmed with the client 2026-08-31. They are genuinely
+-- different boats with different interiors, not two labels for one hull.
+--
+-- CAPACITY IS STILL A PLACEHOLDER. 500 each is the figure from context.md §1,
+-- but that was stated before we knew these were distinct vessels — two different
+-- boats having identical capacity is an assumption, not a confirmed fact. Verify
+-- both figures with the client before launch. The schema already supports them
+-- differing; only this seed asserts they match.
 
 insert into public.yachts (name, capacity, image_url, active)
-select 'Nile Sultana', 500, null, true   -- PLACEHOLDER name / PLACEHOLDER capacity
-where not exists (select 1 from public.yachts where name = 'Nile Sultana');
+select 'Nile Maxim', 500, null, true              -- PLACEHOLDER capacity
+where not exists (select 1 from public.yachts where name = 'Nile Maxim');
+
+insert into public.yachts (name, capacity, image_url, active)
+select 'The Pharaohs', 500, null, true            -- PLACEHOLDER capacity
+where not exists (select 1 from public.yachts where name = 'The Pharaohs');
 
 
 -- -----------------------------------------------------------------------------

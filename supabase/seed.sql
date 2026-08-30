@@ -15,6 +15,21 @@
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
+-- FX rate — PLACEHOLDER rate
+-- -----------------------------------------------------------------------------
+-- Checkout cannot convert USD to EGP without a row here, so local development
+-- needs one. The RATE ITSELF IS INVENTED and must not be used for anything real:
+-- before launch, insert a row with the actual rate, sourced deliberately.
+--
+-- To change the rate, INSERT a new row — never update this one. The table is
+-- append-only and its history is the change log (see the migration).
+
+insert into public.fx_rates (rate_micros, buffer_bps, note)
+select 48750000, 300, 'PLACEHOLDER seed rate for local development — not a real rate'
+where not exists (select 1 from public.fx_rates);
+
+
+-- -----------------------------------------------------------------------------
 -- Yachts — PLACEHOLDER names, PLACEHOLDER capacity
 -- -----------------------------------------------------------------------------
 -- image_url is left null: no yacht photography exists yet (context.md §9), so

@@ -165,6 +165,33 @@ export type Database = {
           },
         ]
       }
+      fx_rates: {
+        Row: {
+          buffer_bps: number
+          created_at: string
+          effective_from: string
+          id: string
+          note: string | null
+          rate_micros: number
+        }
+        Insert: {
+          buffer_bps?: number
+          created_at?: string
+          effective_from?: string
+          id?: string
+          note?: string | null
+          rate_micros: number
+        }
+        Update: {
+          buffer_bps?: number
+          created_at?: string
+          effective_from?: string
+          id?: string
+          note?: string | null
+          rate_micros?: number
+        }
+        Relationships: []
+      }
       organizer_users: {
         Row: {
           active: boolean

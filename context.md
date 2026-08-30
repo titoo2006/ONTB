@@ -211,6 +211,14 @@ Every one of them was surfaced while drafting the Terms and Privacy pages
 resolve any of them by guessing — that is exactly how a policy gets created by
 accident.
 
+- **The seeded FX rate is a placeholder. Someone must insert a real,
+  deliberately sourced rate before accepting real payments.** `supabase/seed.sql`
+  inserts `48750000` (48.75 EGP/USD) purely so local development can convert at
+  all; the number is invented and marked as such. Because `fx_rates` is
+  append-only, fixing it is inserting one row with the real rate and a note — not
+  editing the seed. Nothing in the system can detect that a *plausible* rate is
+  wrong, which is exactly why this is on the launch checklist rather than left to
+  be noticed.
 - **Operator cancellation policy.** What happens when *we* cancel a sailing —
   weather, river conditions, safety — is undefined. It cannot inherit the
   no-show rule: a guest who arrives for a cancelled cruise has plainly not
@@ -273,6 +281,25 @@ Format: date — decision — why.
   guest), `charged_amount_piasters`, `fx_rate_snapshot_micros`. Commission
   reconciliation is `sum(headcount) × $30` from a constant. CLAUDE.md Rule 8
   amended accordingly.
+- **2026-08-30** — **FX: a fixed, reviewed rate in an append-only `fx_rates`
+  table, with a 3% buffer and a 14-day staleness warning.** Not a live FX API: a
+  booking that fails because a rates API timed out mid-checkout is a worse
+  outcome than a rate that is a few days stale. Not an environment variable
+  either — on Vercel that needs a redeploy to change and carries no history, so
+  "log it when you change it" would depend on someone remembering, which is the
+  discipline that fails over months. The table is append-only, so **inserting a
+  row IS the change log**: every rate ever used, dated, with a note. It also
+  makes staleness detectable, which an env var cannot do.
+
+  **The 3% buffer protects the CLIENT, not us.** The full charge settles to their
+  account and our $30 is contractual and settled offline, so the buffer absorbs
+  currency drift against their revenue. The client should understand this is
+  happening rather than discover it — CTO is briefing them.
+
+  Staleness is a warning, never a block: the risk being managed is that nobody
+  notices, not that the number drifts. `fx_rates` is service-role only (RLS on,
+  no policies, no grants) — the raw rate and our margin are internal pricing
+  config, and a browser-reachable write path would be a way to alter prices.
 - **2026-08-30** — **We own the USD→EGP rate; Paymob does not convert for us.**
   Paymob is EGP-denominated and both its order-registration and payment-key calls
   require `amount_cents` in piasters, so the EGP figure must exist before handoff.

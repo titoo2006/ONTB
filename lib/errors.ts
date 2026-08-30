@@ -78,6 +78,31 @@ export const AppError = {
     ),
   },
 
+  FX: {
+    /**
+     * No usable rate row exists. Checkout cannot price a booking in EGP, so this
+     * blocks payment — correctly. Charging a guessed amount would be worse than
+     * not charging at all.
+     */
+    RATE_UNAVAILABLE: define(
+      "FX.RATE_UNAVAILABLE",
+      "We can't process payments right now. Please try again shortly.",
+      "unexpected",
+    ),
+    /**
+     * The newest rate is older than the review window. Deliberately does NOT
+     * block checkout — taking the site down over a stale-but-plausible rate is a
+     * worse outcome than charging a slightly drifted one. Surfaced on the admin
+     * dashboard so a human notices, which is the actual failure being defended
+     * against.
+     */
+    RATE_STALE: define(
+      "FX.RATE_STALE",
+      "The exchange rate has not been reviewed recently.",
+      "expected",
+    ),
+  },
+
   TRIP: {
     LISTING: {
       LOAD_FAILED: define(

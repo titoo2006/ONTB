@@ -58,7 +58,42 @@ export function formatUsdCents(cents: number): string {
   return negative ? `-${body}` : body;
 }
 
-// TODO: convertUsdCentsToPiasters(), the single USD->EGP conversion used at
-// checkout handoff. Blocked only on the FX rate source and buffer being agreed
-// (context.md §8). Paymob requires piasters at handoff, so this cannot be
-// deferred to the webhook — see the 2026-08-30 decision-log entry.
+/**
+ * Apply the margin buffer to a raw rate, giving the rate actually charged at.
+ *
+ * `bufferBps` is basis points: 300 = 3%. The result is what gets stored as
+ * `fx_rate_snapshot_micros` on the booking, so the charge is exactly
+ * reproducible from the stored rate rather than approximately so.
+ *
+ * This rounds a RATE, not money — Rule 8's "never round twice" concerns money
+ * values, and rounding here is what makes the single later money rounding
+ * reproducible.
+ */
+export function applyFxBuffer(rateMicros: number, bufferBps: number): number {
+  const scaled = BigInt(rateMicros) * BigInt(10_000 + bufferBps);
+  const denominator = 10_000n;
+  return Number((scaled + denominator / 2n) / denominator);
+}
+
+/**
+ * Convert USD cents to Egyptian piasters at a given effective rate.
+ *
+ * `effectiveRateMicros` is EGP per USD × 1,000,000, buffer already applied.
+ *
+ *   piasters = usdCents × rateMicros / 1,000,000
+ *
+ * because usdCents/100 × (rateMicros/1e6) × 100 collapses to exactly that.
+ *
+ * BigInt throughout, then a single round at the end (Rule 8 — round once, at the
+ * point of calculation). BigInt is not paranoia: a large headcount at a weak EGP
+ * multiplies to values where float precision would start silently lying, and
+ * this number is what a guest's card is charged.
+ */
+export function convertUsdCentsToPiasters(
+  usdCents: number,
+  effectiveRateMicros: number,
+): number {
+  const numerator = BigInt(usdCents) * BigInt(effectiveRateMicros);
+  const denominator = 1_000_000n;
+  return Number((numerator + denominator / 2n) / denominator);
+}

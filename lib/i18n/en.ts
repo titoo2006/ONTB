@@ -28,9 +28,19 @@ export const en = {
     /** Rendered in the accent script style — DESIGN.md §2 allows it here only. */
     titleLine2: "every evening",
     body: "Two hours aboard a 500-guest yacht, with an open buffet, live singing, and Cairo lit up on both banks.",
-    primaryCta: "See tonight's sailings",
+    ctaPrimary: "View trips",
+    ctaSecondary: "Book tonight",
     priceFrom: "From",
     priceUnit: "per person",
+  },
+
+  heroSearch: {
+    dateLabel: "Date",
+    anyDate: "Any date",
+    guestsLabel: "Guests",
+    guestsOption: (n: number) => `${n} ${n === 1 ? "guest" : "guests"}`,
+    searchButton: "Search",
+    searching: "Searching…",
   },
 
   trust: {
@@ -77,6 +87,10 @@ export const en = {
     viewTrip: "View trip",
 
     emptyTitle: "No trips scheduled for this date",
+    /** With a party-size filter on, say WHY it's empty — "no sailings" and "none
+     *  big enough for 12" are different problems with different next steps. */
+    emptyTitleForParty: (guests: number) =>
+      `No sailings with room for ${guests} ${guests === 1 ? "guest" : "guests"}`,
     emptyBody: "Try another date — cruises run every day.",
     emptyNextAvailable: (dateLabel: string) => `Next available: ${dateLabel}`,
     emptyShowAll: "Show the next 7 days",

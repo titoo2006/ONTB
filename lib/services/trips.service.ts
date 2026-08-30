@@ -21,10 +21,17 @@ export const LISTING_WINDOW_DAYS = 7;
  * and "still departing" is judged against Cairo wall-clock time, never the
  * visitor's browser — ~90% of guests browse from another country.
  *
- * @param date  Restrict to a single Cairo date. Omit for the default 7-day window.
+ * @param date      Restrict to a single Cairo date. Omit for the default window.
+ * @param minSeats  Only sailings with room for a party this size. Filtered in
+ *                  application code rather than SQL because `seats_booked` is a
+ *                  live counter — the value that matters is the one read in the
+ *                  same pass as everything else on the page, and it is still only
+ *                  informational either way (context.md §5). A guest whose party
+ *                  no longer fits by the time they click gets the sold-out path.
  */
 export async function listUpcomingTrips(
   date?: CairoDate,
+  minSeats?: number,
 ): Promise<TripListingDay[]> {
   const supabase = createSupabaseServerClient();
 
@@ -73,6 +80,10 @@ export async function listUpcomingTrips(
     // one place (lib/time.ts) rather than from the database server's clock.
     if (!isFutureInCairo(row.trip_date, row.departure_time)) continue;
 
+    // Party-size filter from the hero search bar.
+    const seatsRemaining = Math.max(0, row.capacity - row.seats_booked);
+    if (minSeats !== undefined && seatsRemaining < minSeats) continue;
+
     const yacht = yachtsById.get(row.yacht_id);
     if (!yacht) continue;
 
@@ -83,7 +94,7 @@ export async function listUpcomingTrips(
       tripDate: row.trip_date,
       departureTime: row.departure_time,
       capacity: row.capacity,
-      seatsRemaining: Math.max(0, row.capacity - row.seats_booked),
+      seatsRemaining,
       pricePerGuestUsdCents: GUEST_PRICE_USD_CENTS,
     };
 

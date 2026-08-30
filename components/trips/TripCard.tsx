@@ -22,7 +22,14 @@ import type { TripListingItem } from "@/types/domain";
  * The price sits in the accent gold — DESIGN.md §1 reserves gold for prices and
  * CTAs, and this is the one number a browsing guest is looking for.
  */
-export function TripCard({ trip }: { trip: TripListingItem }) {
+export function TripCard({
+  trip,
+  guestsParam = "",
+}: {
+  trip: TripListingItem;
+  /** e.g. "?guests=4" — carries the hero's party size into Screen 2. */
+  guestsParam?: string;
+}) {
   const soldOut = trip.seatsRemaining <= 0;
 
   const today = cairoToday();
@@ -122,7 +129,7 @@ export function TripCard({ trip }: { trip: TripListingItem }) {
             </span>
           ) : (
             <Link
-              href={`/trips/${trip.id}`}
+              href={`/trips/${trip.id}${guestsParam}`}
               className="flex min-h-touch items-center justify-center rounded-sm bg-primary px-4 text-base font-semibold text-text-on-primary hover:bg-primary-light active:translate-y-px"
             >
               {en.tripListing.viewTrip}

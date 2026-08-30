@@ -1,43 +1,49 @@
+import Link from "next/link";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { HeroSearchBar } from "@/components/home/HeroSearchBar";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { en } from "@/lib/i18n/en";
-import { getHeroImageUrl } from "@/lib/media";
+import { HERO_IMAGES } from "@/lib/media";
 import { formatUsdCents, GUEST_PRICE_USD_CENTS } from "@/lib/money";
+import { cairoDateRange, cairoToday, type CairoDate } from "@/lib/time";
+import { LISTING_WINDOW_DAYS } from "@/lib/services/trips.service";
 
 /**
  * Homepage hero — DESIGN.md §9.
  *
- * Built so photography is a drop-in, not a rewrite: when NEXT_PUBLIC_HERO_IMAGE_URL
- * is set the image loads beneath the scrim; when it isn't, the layered gradient
- * treatment stands alone and still reads as designed rather than broken
- * (context.md §9 — no yacht photography exists yet).
+ * Server component. The rotating background and the search bar are the only
+ * client pieces; the headline, CTAs, and price stay server-rendered.
+ *
+ * Dates for the search bar are computed HERE, server-side, in Cairo — never in
+ * the browser (context.md §5.1). ~90% of guests browse from another country.
  *
  * The scrim is not decoration. White text over an unknown photograph cannot be
- * assumed to clear 4.5:1 (DESIGN.md §7), so the gradient guarantees the contrast
- * regardless of which image is eventually dropped in.
+ * assumed to clear 4.5:1 (DESIGN.md §7), so the gradient guarantees contrast
+ * whichever image is showing, and `--color-deep` sits beneath so it holds even
+ * if an image fails to load.
  */
-export function Hero() {
-  const heroImage = getHeroImageUrl();
+export function Hero({
+  bookTonightDate,
+  selectedDate,
+  selectedGuests,
+}: {
+  /**
+   * Where "Book tonight" points. Defaults to today in Cairo; the listing page
+   * passes the first date that actually has sailings, so late in the evening —
+   * when today's departures have gone — the button lands somewhere bookable
+   * rather than on an empty state.
+   */
+  bookTonightDate?: CairoDate | undefined;
+  selectedDate?: CairoDate | undefined;
+  selectedGuests?: number | undefined;
+}) {
+  const today = cairoToday();
+  const dates = cairoDateRange(today, LISTING_WINDOW_DAYS);
+  const tonight = bookTonightDate ?? today;
 
   return (
-    <section className="relative isolate overflow-hidden bg-deep">
-      {heroImage ? (
-        // eslint-disable-next-line @next/next/no-img-element -- source may be a
-        // remote host not yet added to next.config images.remotePatterns.
-        <img
-          src={heroImage}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <div aria-hidden="true" className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-deep to-deep" />
-          {/* Suggests water and evening light without depicting a boat we can't
-              verify — an illustrated yacht would imply a style the real vessels
-              may not have (context.md §9). */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-primary-light/30 to-transparent" />
-          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
-        </div>
-      )}
+    <section className="relative isolate bg-deep pb-16 sm:pb-12">
+      <HeroCarousel images={HERO_IMAGES} />
 
       {/* Contrast guarantee for the header and headline. */}
       <div
@@ -47,12 +53,12 @@ export function Hero() {
 
       <SiteHeader />
 
-      <div className="relative mx-auto max-w-content px-4 pb-12 pt-32 md:px-6 md:pb-12 md:pt-40">
+      <div className="relative mx-auto max-w-content px-4 pb-24 pt-32 md:px-6 md:pb-28 md:pt-40">
         <p className="mb-4 inline-flex rounded-full border border-text-on-primary/25 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-text-on-primary">
           {en.hero.eyebrow}
         </p>
 
-        <h1 className="max-w-2xl text-3xl font-semibold leading-tight text-text-on-primary">
+        <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-text-on-primary">
           {en.hero.titleLine1}
           <br />
           <span className="text-accent">{en.hero.titleLine2}</span>
@@ -62,36 +68,52 @@ export function Hero() {
           {en.hero.body}
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-6">
+        {/* Two CTAs with genuinely different destinations. Both pointing at the
+            listing would be two buttons doing one thing. */}
+        <div className="mt-8 flex flex-wrap items-center gap-4">
           <a
             href="#sailings"
             className="flex min-h-touch items-center rounded-sm bg-accent px-6 text-base font-semibold text-text-on-accent shadow-card hover:opacity-90 hover:shadow-card-hover active:translate-y-px"
           >
-            {en.hero.primaryCta}
+            {en.hero.ctaPrimary}
           </a>
-
-          <p className="flex items-baseline gap-2 text-text-on-primary">
-            <span className="text-sm text-text-on-primary/80">
-              {en.hero.priceFrom}
-            </span>
-            <span className="text-2xl font-semibold">
-              {formatUsdCents(GUEST_PRICE_USD_CENTS)}
-            </span>
-            <span className="text-sm text-text-on-primary/80">
-              {en.hero.priceUnit}
-            </span>
-          </p>
+          <Link
+            href={`/?date=${tonight}#sailings`}
+            className="flex min-h-touch items-center rounded-sm border border-text-on-primary/40 px-6 text-base font-semibold text-text-on-primary hover:bg-text-on-primary/10 active:translate-y-px"
+          >
+            {en.hero.ctaSecondary}
+          </Link>
         </div>
 
-        {/*
-          CLAUDE.md Rule 13 / DESIGN.md §8 — wherever a USD price appears, the EGP
-          disclosure appears with it, at a legible size rather than shrunk into
-          fine print. The binding placement is beside the pay button on Screen 3;
-          stating it this early means it is never a surprise at checkout.
-        */}
-        <p className="mt-3 text-sm text-text-on-primary/80">
-          {en.checkout.egpDisclosure}
-        </p>
+        <div className="mt-8 flex flex-wrap items-baseline gap-2 text-text-on-primary">
+          <span className="text-sm text-text-on-primary/80">
+            {en.hero.priceFrom}
+          </span>
+          <span className="text-2xl font-semibold">
+            {formatUsdCents(GUEST_PRICE_USD_CENTS)}
+          </span>
+          <span className="text-sm text-text-on-primary/80">
+            {en.hero.priceUnit}
+          </span>
+          {/*
+            CLAUDE.md Rule 13 / DESIGN.md §8 — wherever a USD price appears, the
+            EGP disclosure appears with it, at a legible size rather than shrunk
+            into fine print. The binding placement is beside the pay button on
+            Screen 3; saying it this early means it is never a surprise.
+          */}
+          <span className="w-full text-sm text-text-on-primary/80">
+            {en.checkout.egpDisclosure}
+          </span>
+        </div>
+      </div>
+
+      {/* Floating search bar, overlapping the bottom edge of the hero. */}
+      <div className="relative mx-auto -mb-28 max-w-content px-4 md:px-6">
+        <HeroSearchBar
+          dates={dates}
+          selectedDate={selectedDate}
+          selectedGuests={selectedGuests}
+        />
       </div>
     </section>
   );

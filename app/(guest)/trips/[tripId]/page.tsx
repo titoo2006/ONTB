@@ -7,7 +7,7 @@ import { TripViewTracker } from "@/components/trips/TripViewTracker";
 import { getTripDetailsAction } from "@/lib/actions/trips.actions";
 import { en } from "@/lib/i18n/en";
 import { formatCairoDateLabel, formatDepartureTime } from "@/lib/time";
-import { tripInstanceIdSchema } from "@/lib/validators";
+import { parseHeadcount, tripInstanceIdSchema } from "@/lib/validators";
 
 /**
  * SCREEN 2 — Trip Details. PRD_Phase1.md §Screen 2.
@@ -35,8 +35,10 @@ import { tripInstanceIdSchema } from "@/lib/validators";
  */
 export default async function TripDetailsPage({
   params,
+  searchParams,
 }: {
   params: { tripId: string };
+  searchParams: { guests?: string };
 }) {
   noStore();
 
@@ -144,7 +146,10 @@ export default async function TripDetailsPage({
               </Link>
             </div>
           ) : (
-            <BookingForm trip={trip} />
+            <BookingForm
+              trip={trip}
+              initialHeadcount={parseHeadcount(searchParams.guests) ?? 1}
+            />
           )}
         </aside>
       </div>

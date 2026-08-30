@@ -1,30 +1,59 @@
 /**
  * Where photography comes from, and what happens when there isn't any.
  *
- * context.md §9: no yacht photography exists yet. Every image slot in the UI is
- * therefore optional — components render a designed fallback treatment when a
- * source is absent, never a broken image and never an empty box.
+ * context.md §9: no usable yacht photography exists yet. Every image slot in the
+ * UI is therefore optional — components render a designed fallback treatment
+ * when a source is absent, never a broken image and never an empty box.
  *
- * TO ADD REAL PHOTOGRAPHY (no code change required for cards):
- *   - Trip cards read `yachts.image_url`. Set that column and cards use it.
- *   - The hero reads NEXT_PUBLIC_HERO_IMAGE_URL, or falls back to a file
- *     dropped at public/images/hero.jpg (see public/images/README.md).
- *
- * If a remote host is used rather than a local file, its domain must be added to
- * `images.remotePatterns` in next.config.mjs before next/image will load it.
+ * TO ADD REAL PHOTOGRAPHY (no code change beyond this file):
+ *   - Hero: drop files in public/images/hero/ and list them in HERO_IMAGES.
+ *   - Trip cards: set the `yachts.image_url` column. Cards use it automatically.
  */
 
-/** Local path used when no env override is set. May simply not exist yet. */
-export const DEFAULT_HERO_IMAGE_PATH = "/images/hero.jpg";
+export interface HeroImage {
+  /** Path under public/, e.g. "/images/hero/01-exterior.jpg". */
+  src: string;
+  /**
+   * CSS object-position for the crop.
+   *
+   * Every hero image is cropped with object-cover, which scales and crops
+   * without ever distorting. On a PORTRAIT source in a wide hero that discards
+   * most of the height, so this chooses which band survives.
+   *
+   * "center" keeps the middle. Use e.g. "center 30%" to bias upward when the
+   * subject sits high in frame, or "center 70%" to bias downward. Tune these by
+   * looking at the rendered hero, not by guessing from the file.
+   */
+  focalPoint: string;
+}
 
 /**
- * The hero background image, or null to use the CSS treatment.
+ * Hero background images, rotated in this order.
  *
- * Returns null unless explicitly configured — we do not point at a local file
- * that may not exist, because a 404'd hero image is worse than a designed
- * gradient. Set NEXT_PUBLIC_HERO_IMAGE_URL to turn photography on.
+ * EMPTY BY DESIGN (2026-08-31). Four candidate files were supplied and rejected:
+ * three carried another operator's logos ("Nile Booking", "Nile Maxim", "The
+ * Pharaohs Cruising Restaurants") and a competing booking phone number burned
+ * into the pixels, plus Arabic text that could never be localised (Rule 13); the
+ * fourth was a Cairo skyline with no boat in it. Cropping could not save them —
+ * the logos and text sit in the exact middle band a wide crop keeps.
+ *
+ * While this array is empty the hero renders its gradient treatment, which is a
+ * holding position rather than the design (DESIGN.md §9.1).
+ *
+ * BEFORE ADDING ANY IMAGE HERE, it must be:
+ *   - the client's own two yachts, never another operator's
+ *   - free of logos, phone numbers, and any burned-in text
+ *   - licensed for commercial use
+ *
+ * Expected order once available: exterior (day), buffet, dining interior,
+ * exterior (night).
  */
-export function getHeroImageUrl(): string | null {
-  const configured = process.env.NEXT_PUBLIC_HERO_IMAGE_URL;
-  return configured && configured.trim().length > 0 ? configured : null;
-}
+export const HERO_IMAGES: HeroImage[] = [
+  // { src: "/images/hero/01-exterior.jpg", focalPoint: "center" },
+  // { src: "/images/hero/02-buffet.jpg",   focalPoint: "center" },
+  // { src: "/images/hero/03-dining.jpg",   focalPoint: "center" },
+  // { src: "/images/hero/04-night.jpg",    focalPoint: "center" },
+];
+
+/** How long each hero image is shown, in milliseconds. */
+export const HERO_ROTATION_MS = 3000;

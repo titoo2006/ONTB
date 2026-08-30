@@ -21,8 +21,21 @@ import type { TripListingItem } from "@/types/domain";
  * Rule 14 / DESIGN.md §5.6 — the submit button disables during the request so a
  * double click cannot fire two navigations.
  */
-export function BookingForm({ trip }: { trip: TripListingItem }) {
-  const [headcount, setHeadcount] = useState(1);
+export function BookingForm({
+  trip,
+  initialHeadcount = 1,
+}: {
+  trip: TripListingItem;
+  /**
+   * Prefilled from the hero search bar's party size. Clamped to what this
+   * sailing can actually seat — a guest who searched for 12 and opens a trip
+   * with 5 left should see 5 selected, not a value the form cannot honour.
+   */
+  initialHeadcount?: number;
+}) {
+  const [headcount, setHeadcount] = useState(
+    Math.max(1, Math.min(initialHeadcount, trip.seatsRemaining || 1)),
+  );
   const [result, setResult] = useState<StartBookingResult | null>(null);
   const [isPending, startTransition] = useTransition();
 

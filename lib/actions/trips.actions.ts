@@ -22,8 +22,9 @@ import type { TripListingDay, TripListingItem } from "@/types/domain";
  */
 export async function getUpcomingTripsAction(
   date?: CairoDate,
+  minSeats?: number,
 ): Promise<TripListingDay[]> {
-  return listUpcomingTrips(date);
+  return listUpcomingTrips(date, minSeats);
 }
 
 /** Empty-state shortcut — the next Cairo date that still has a departure. */

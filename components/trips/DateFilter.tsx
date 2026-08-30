@@ -15,20 +15,29 @@ interface DateFilterProps {
   dates: CairoDate[];
   /** `| undefined` is required by exactOptionalPropertyTypes in tsconfig. */
   selected?: CairoDate | undefined;
+  /** Party size from the hero search bar, preserved when switching days so a
+   *  guest filtering for 8 doesn't silently lose it by tapping another date. */
+  guests?: number | undefined;
 }
 
-export function DateFilter({ dates, selected }: DateFilterProps) {
+export function DateFilter({ dates, selected, guests }: DateFilterProps) {
+  const guestsSuffix = guests ? `&guests=${guests}` : "";
+  const allHref = guests ? `/?guests=${guests}` : "/";
+
   return (
     <nav aria-label={en.tripListing.dateFilterLabel}>
       <ul className="flex list-none gap-2 overflow-x-auto pb-2">
         <li>
-          <FilterPill href="/" active={selected === undefined}>
+          <FilterPill href={allHref} active={selected === undefined}>
             {en.tripListing.allUpcoming}
           </FilterPill>
         </li>
         {dates.map((date) => (
           <li key={date}>
-            <FilterPill href={`/?date=${date}`} active={selected === date}>
+            <FilterPill
+              href={`/?date=${date}${guestsSuffix}`}
+              active={selected === date}
+            >
               {formatCairoDateLabel(date)}
             </FilterPill>
           </li>

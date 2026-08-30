@@ -1,5 +1,5 @@
 # PRD — Phase 1: Core Booking Funnel, Check-In, and Minimal Admin
-## NileBook — Nile Yacht Trip Booking Platform
+## Nile Booking — Nile Yacht Trip Booking Platform
 
 ---
 

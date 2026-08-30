@@ -1,4 +1,4 @@
-# DESIGN.md — NileBook Design System
+# DESIGN.md — Nile Booking Design System
 
 > Proposed starting system, not final brand assets. If the client has an existing
 > logo, brand colors, or yacht photography, replace §1 and §6 with those before

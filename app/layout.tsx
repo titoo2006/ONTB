@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NileBook — Nile Dinner Cruise Booking",
+  title: "Nile Booking — Nile Dinner Cruise Booking",
   description: "Book a Nile dinner-cruise yacht trip in Egypt.",
 };
 

@@ -9,7 +9,7 @@ import { termsDraft } from "@/lib/i18n/legal";
  * not merely findable afterwards (context.md §9).
  */
 export const metadata = {
-  title: "Terms and conditions — NileBook",
+  title: "Terms and conditions — Nile Booking",
 };
 
 export default function TermsPage() {

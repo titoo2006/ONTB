@@ -1,4 +1,4 @@
-# PROJECT CONTEXT — NileBook (working title)
+# PROJECT CONTEXT — Nile Booking
 ## Online booking platform for Nile yacht dinner-cruise trips — Egypt
 
 > This file is the source of truth about what IS true in this system: the business,
@@ -29,9 +29,28 @@ seats on Nile dinner-cruise yacht trips in Egypt directly online, instead of onl
 through local trip offices. The platform handles browsing, payment, digital ticketing,
 and on-site check-in.
 
-**Client:** owns 2 yachts, each with a 500-guest capacity. Each yacht runs 3 trips per
-day (2 hours per trip, includes open buffet food, activities, live singing) — 6 trips
+**Client:** owns 2 yachts — **Nile Maxim** and **The Pharaohs** (confirmed
+2026-08-31) — each with a 500-guest capacity. Each yacht runs 3 trips per day
+(2 hours per trip, includes open buffet food, activities, live singing) — 6 trips
 per day across the fleet.
+
+**Brands:** the client trades under several names — *Nile Booking* (the booking
+brand this platform is built for), *Nile Maxim*, and *The Pharaohs Cruising
+Restaurants*. All are his own; none is a competitor. This matters when reviewing
+supplied photography, which frequently carries one brand's logo.
+
+**The two yachts are genuinely different vessels**, with visibly different
+interiors — not two labels for one hull. Two consequences worth holding onto:
+- The 500-guest capacity figure for *both* is inherited from the original brief
+  and has not been re-confirmed since we learned they are distinct boats. Verify
+  each separately. The schema already stores capacity per yacht and snapshots it
+  per trip instance, so differing figures need no code change — only the seed
+  currently asserts they match.
+- Guest-facing copy still describes one generic product (see §9, 2026-08-29:
+  the activities line is static because "all 6 daily trips are the same
+  product"). That premise is now worth re-testing with the client — if the two
+  boats differ in food, entertainment, or capacity, the copy should move to
+  per-yacht columns rather than a shared constant.
 
 **Current state (before this platform):** 100% of bookings go through local trip
 offices. No online booking or online marketing funnel exists. Client currently serves
@@ -295,6 +314,29 @@ Format: date — decision — why.
   guest), `charged_amount_piasters`, `fx_rate_snapshot_micros`. Commission
   reconciliation is `sum(headcount) × $30` from a constant. CLAUDE.md Rule 8
   amended accordingly.
+- **2026-08-31** — **The platform is named "Nile Booking", after the client's
+  existing trading brand.** It is NOT a working title and must not be "corrected"
+  back to the earlier placeholder "NileBook". The client trades under several of
+  his own names — *Nile Booking* (the booking brand), *Nile Maxim* and *The
+  Pharaohs Cruising Restaurants* (the two vessels). Guests will have seen "Nile
+  Booking" on his existing material, so a near-miss variant on the site would
+  read as a different, less trustworthy operator. Spelled with a space, matching
+  his own artwork.
+
+  Deliberately NOT renamed: `package.json` / `package-lock.json` stay `nilebook`
+  (never guest-visible, and renaming churns the lockfile for nothing), and
+  `lib/i18n/legal.ts` keeps its `[LEGAL ENTITY NAME]` placeholder — "Nile
+  Booking" is a trading brand, and terms must name the **registered company** a
+  guest actually contracts with. That name is still outstanding (§8).
+- **2026-08-31** — **The two yachts are `Nile Maxim` and `The Pharaohs`**,
+  confirmed with the client, replacing the invented placeholders "Nile Empress"
+  and "Nile Sultana". They are genuinely different vessels with different
+  interiors. The schema needed no change — capacity, name, and image_url are
+  already per-yacht and snapshotted per trip instance — but two assumptions in
+  the COPY now deserve re-testing: guest-facing text hardcodes "500-guest yacht"
+  in two places, and the activities line is a shared constant on the premise that
+  both boats sell the same product (§9, 2026-08-29). Their capacities have also
+  not been separately confirmed since we learned they are distinct hulls.
 - **2026-08-30** — **FX: a fixed, reviewed rate in an append-only `fx_rates`
   table, with a 3% buffer and a 14-day staleness warning.** Not a live FX API: a
   booking that fails because a rates API timed out mid-checkout is a worse

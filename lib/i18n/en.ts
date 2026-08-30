@@ -15,7 +15,8 @@ export const en = {
   },
 
   siteHeader: {
-    brand: "NileBook",
+    /** The client's own trading brand, not a working title (context.md §9). */
+    brand: "Nile Booking",
     brandTagline: "Nile Dinner Cruises",
     needHelp: "Need help?",
     /** PLACEHOLDER — replace with the client's real reservations number. */

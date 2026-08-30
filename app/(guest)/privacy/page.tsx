@@ -9,7 +9,7 @@ import { privacyDraft } from "@/lib/i18n/legal";
  * changes in the same commit, not later.
  */
 export const metadata = {
-  title: "Privacy policy — NileBook",
+  title: "Privacy policy — Nile Booking",
 };
 
 export default function PrivacyPage() {

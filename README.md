@@ -1,4 +1,4 @@
-# NileBook
+# Nile Booking
 
 Online booking platform for Nile dinner-cruise yacht trips in Egypt.
 

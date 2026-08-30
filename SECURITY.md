@@ -1,5 +1,5 @@
 # SECURITY.md — Technical Security Specification
-## NileBook — Nile Yacht Trip Booking Platform
+## Nile Booking — Nile Yacht Trip Booking Platform
 
 ## Priority Legend
 🔴 P0 — must be in place before Phase 1 launch, no exceptions.

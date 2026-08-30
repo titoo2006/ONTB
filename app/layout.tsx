@@ -7,9 +7,18 @@ export const metadata: Metadata = {
 };
 
 /**
- * Guest-facing pages default to English (CLAUDE.md Rule 13).
- * SCAFFOLD STUB — font wiring (next/font → --font-sans / --font-mono) and the
- * shared header/footer come with Screen 1.
+ * Root layout — deliberately almost empty.
+ *
+ * Only the root layout may render <html> and <body>, so this holds those and
+ * nothing else. Everything with a policy attached to it lives one level down:
+ *
+ *   app/(guest)/layout.tsx  — consent scripts, PageView tracking, public footer
+ *   app/(staff)/layout.tsx  — none of the above
+ *
+ * Route groups do not appear in URLs, so /organizer and /admin are unchanged.
+ * The split exists so a tracking script CANNOT be rendered on a staff route by
+ * accident: it is not that the staff layout disables tracking, it is that the
+ * component which injects it is not in that tree at all.
  */
 export default function RootLayout({
   children,

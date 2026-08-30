@@ -42,6 +42,12 @@ const config: Config = {
         // DESIGN.md §1 — Borders
         border: "var(--color-border)",
         "border-strong": "var(--color-border-strong)",
+
+        // DESIGN.md §9 — scrims for text over photography
+        "scrim-strong": "var(--color-scrim-strong)",
+        "scrim-soft": "var(--color-scrim-soft)",
+        "scrim-none": "var(--color-scrim-none)",
+        deep: "var(--color-deep)",
       },
       fontSize: {
         // DESIGN.md §2
@@ -83,6 +89,20 @@ const config: Config = {
         // DESIGN.md §5.1 general touch target / §6 organizer-screen touch target
         touch: "44px",
         "touch-organizer": "48px",
+      },
+      // DESIGN.md §10 — elevation. Only these three; no arbitrary shadow values.
+      boxShadow: {
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        overlay: "var(--shadow-overlay)",
+      },
+      transitionTimingFunction: {
+        out: "var(--ease-out)",
+      },
+      transitionDuration: {
+        fast: "var(--duration-fast)",
+        base: "var(--duration-base)",
+        slow: "var(--duration-slow)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

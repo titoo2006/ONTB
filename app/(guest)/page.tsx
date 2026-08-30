@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Hero } from "@/components/home/Hero";
+import { TrustStrip } from "@/components/home/TrustStrip";
 import { DateFilter } from "@/components/trips/DateFilter";
 import { TripCard } from "@/components/trips/TripCard";
 import {
@@ -11,7 +13,7 @@ import { cairoDateRange, cairoToday, formatCairoDateLabel } from "@/lib/time";
 import type { CairoDate } from "@/lib/time";
 
 /**
- * SCREEN 1 — Trip Listing (Homepage). PRD_Phase1.md §Screen 1.
+ * SCREEN 1 — Trip Listing (Homepage). PRD_Phase1.md §Screen 1, DESIGN.md §9.
  *
  * Server component. Rule 6: it calls a server action, which calls the service,
  * which is the only thing that touches Supabase.
@@ -45,39 +47,44 @@ export default async function TripListingPage({
     : null;
 
   return (
-    <main className="mx-auto max-w-content px-4 py-8 md:px-6">
-      <header className="mb-6 flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-text-primary">
-          {en.tripListing.pageTitle}
-        </h1>
-        <p className="text-base text-text-secondary">
-          {en.tripListing.pageSubtitle}
-        </p>
-      </header>
+    <>
+      <Hero />
+      <TrustStrip />
 
-      <div className="mb-8">
-        <DateFilter dates={windowDates} selected={selectedDate} />
-      </div>
+      <main id="sailings" className="mx-auto max-w-content px-4 py-12 md:px-6">
+        <header className="mb-6 flex flex-col gap-2">
+          <h2 className="text-2xl font-semibold text-text-primary">
+            {en.tripListing.pageTitle}
+          </h2>
+          <p className="text-base text-text-secondary">
+            {en.tripListing.pageSubtitle}
+          </p>
+        </header>
 
-      {isEmpty ? (
-        <EmptyState nextAvailable={nextAvailable} />
-      ) : (
-        <div className="flex flex-col gap-8">
-          {days.map((day) => (
-            <section key={day.date} className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold text-text-primary">
-                {formatCairoDateLabel(day.date)}
-              </h2>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {day.trips.map((trip) => (
-                  <TripCard key={trip.id} trip={trip} />
-                ))}
-              </div>
-            </section>
-          ))}
+        <div className="mb-8">
+          <DateFilter dates={windowDates} selected={selectedDate} />
         </div>
-      )}
-    </main>
+
+        {isEmpty ? (
+          <EmptyState nextAvailable={nextAvailable} />
+        ) : (
+          <div className="flex flex-col gap-8">
+            {days.map((day) => (
+              <section key={day.date} className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-text-primary">
+                  {formatCairoDateLabel(day.date)}
+                </h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {day.trips.map((trip) => (
+                    <TripCard key={trip.id} trip={trip} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </main>
+    </>
   );
 }
 
@@ -89,9 +96,9 @@ export default async function TripListingPage({
 function EmptyState({ nextAvailable }: { nextAvailable: CairoDate | null }) {
   return (
     <div className="rounded-md border border-border bg-surface p-8 text-center">
-      <h2 className="text-lg font-semibold text-text-primary">
+      <h3 className="text-lg font-semibold text-text-primary">
         {en.tripListing.emptyTitle}
-      </h2>
+      </h3>
       <p className="mt-2 text-base text-text-secondary">
         {en.tripListing.emptyBody}
       </p>
@@ -99,7 +106,7 @@ function EmptyState({ nextAvailable }: { nextAvailable: CairoDate | null }) {
       {nextAvailable ? (
         <Link
           href={`/?date=${nextAvailable}`}
-          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light"
+          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light active:translate-y-px"
         >
           {en.tripListing.emptyNextAvailable(
             formatCairoDateLabel(nextAvailable),
@@ -108,7 +115,7 @@ function EmptyState({ nextAvailable }: { nextAvailable: CairoDate | null }) {
       ) : (
         <Link
           href="/"
-          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light"
+          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light active:translate-y-px"
         >
           {en.tripListing.emptyShowAll}
         </Link>

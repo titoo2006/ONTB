@@ -95,6 +95,17 @@ export const AppError = {
     },
   },
 
+  ANALYTICS: {
+    // Tracking failures are always `expected` in the sense that they must never
+    // fail the operation they were observing — a booking is confirmed whether
+    // or not Meta ever hears about it.
+    PURCHASE_DISPATCH_FAILED: define(
+      "ANALYTICS.PURCHASE_DISPATCH_FAILED",
+      "Could not send the Purchase event to the Conversions API.",
+      "expected",
+    ),
+  },
+
   BOOKING: {
     CHECKOUT: {
       // PRD_Phase1.md Screen 3

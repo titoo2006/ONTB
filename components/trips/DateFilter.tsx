@@ -54,8 +54,8 @@ function FilterPill({
       className={[
         "flex min-h-touch items-center whitespace-nowrap rounded-full border px-4 text-sm",
         active
-          ? "border-primary bg-primary font-semibold text-text-on-primary"
-          : "border-border bg-surface text-text-primary hover:border-border-strong",
+          ? "border-primary bg-primary font-semibold text-text-on-primary shadow-card"
+          : "border-border bg-surface text-text-primary hover:border-border-strong hover:bg-surface-alt",
       ].join(" ")}
     >
       {children}

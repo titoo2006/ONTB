@@ -14,12 +14,47 @@ export const en = {
     perPerson: "per person",
   },
 
+  siteHeader: {
+    brand: "NileBook",
+    brandTagline: "Nile Dinner Cruises",
+    needHelp: "Need help?",
+    /** PLACEHOLDER — replace with the client's real reservations number. */
+    phone: "+20 000 000 0000",
+  },
+
+  hero: {
+    eyebrow: "Cairo · Nile River · Nightly",
+    titleLine1: "Dinner on the Nile,",
+    /** Rendered in the accent script style — DESIGN.md §2 allows it here only. */
+    titleLine2: "every evening",
+    body: "Two hours aboard a 500-guest yacht, with an open buffet, live singing, and Cairo lit up on both banks.",
+    primaryCta: "See tonight's sailings",
+    priceFrom: "From",
+    priceUnit: "per person",
+  },
+
+  trust: {
+    securePayment: "Secure card payment",
+    securePaymentBody: "Paid online, confirmed instantly.",
+    instantTicket: "Instant e-ticket",
+    instantTicketBody: "QR code to your inbox — no printing.",
+    included: "Buffet and show included",
+    includedBody: "One price, nothing added at the pier.",
+    boarding: "Simple boarding",
+    boardingBody: "Show your code, the whole group boards at once.",
+  },
+
   tripListing: {
-    pageTitle: "Nile dinner cruises",
+    pageTitle: "Choose your sailing",
     pageSubtitle:
       "Two hours on the Nile with an open buffet, live music, and entertainment.",
     dateFilterLabel: "Choose a date",
     allUpcoming: "Next 7 days",
+
+    /** Card badges — all derived from data, never asserted about the product. */
+    badgeTonight: "Tonight",
+    badgeTomorrow: "Tomorrow",
+    badgeFillingFast: "Filling fast",
 
     /**
      * context.md §9 — the activities line is static copy for Phase 1, not a
@@ -62,6 +97,43 @@ export const en = {
   ticket: {},
   organizer: {},
   admin: {},
+
+  consent: {
+    title: "Your privacy choices",
+    body: "We use cookies to run this site. We'd also like to measure how it's used, and to measure our advertising — but only if you agree. You can change this at any time.",
+    acceptAll: "Accept all",
+    rejectAll: "Reject all",
+    customise: "Choose what to allow",
+    save: "Save choices",
+    cancel: "Back",
+
+    necessaryTitle: "Strictly necessary",
+    necessaryBody:
+      "Needed for booking and payment to work. These can't be switched off.",
+    necessaryAlways: "Always on",
+
+    analyticsTitle: "Analytics",
+    analyticsBody:
+      "Helps us see which trips people look at and where the booking process is confusing.",
+
+    marketingTitle: "Advertising",
+    marketingBody:
+      "Lets us measure our ads. If you accept, we share a scrambled version of your email and phone with Meta so they can match your booking to an ad.",
+
+    manageLink: "Privacy choices",
+    updated: "Your privacy choices have been saved.",
+  },
+
+  footer: {
+    tagline: "Nile dinner cruises, booked online.",
+    contact: "Contact",
+    legal: "Legal",
+    terms: "Terms and conditions",
+    privacy: "Privacy policy",
+    rights: "All rights reserved.",
+    /** Rule 13 / DESIGN.md §8 — the EGP disclosure follows the price everywhere. */
+    priceNote: "All prices in USD. Charged in EGP at checkout.",
+  },
 } as const;
 
 export type Translations = typeof en;

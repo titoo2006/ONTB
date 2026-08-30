@@ -45,7 +45,7 @@ export default function TripListingError({
         <button
           type="button"
           onClick={reset}
-          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light"
+          className="mt-6 inline-flex min-h-touch items-center rounded-sm bg-primary px-6 text-base font-semibold text-text-on-primary hover:bg-primary-light active:translate-y-px"
         >
           {en.common.retry}
         </button>

@@ -93,9 +93,11 @@ export type Database = {
       }
       bookings: {
         Row: {
+          analytics_consent: boolean
           booking_code: string
           charged_amount_piasters: number
           checked_in_at: string | null
+          consent_recorded_at: string | null
           created_at: string
           expires_at: string | null
           fx_rate_snapshot_micros: number
@@ -105,6 +107,7 @@ export type Database = {
           guest_price_usd_cents: number
           headcount: number
           id: string
+          marketing_consent: boolean
           nationality: string
           owner_share_piasters: number
           platform_share_piasters: number
@@ -113,9 +116,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          analytics_consent?: boolean
           booking_code: string
           charged_amount_piasters: number
           checked_in_at?: string | null
+          consent_recorded_at?: string | null
           created_at?: string
           expires_at?: string | null
           fx_rate_snapshot_micros: number
@@ -125,6 +130,7 @@ export type Database = {
           guest_price_usd_cents: number
           headcount: number
           id?: string
+          marketing_consent?: boolean
           nationality: string
           owner_share_piasters: number
           platform_share_piasters: number
@@ -133,9 +139,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          analytics_consent?: boolean
           booking_code?: string
           charged_amount_piasters?: number
           checked_in_at?: string | null
+          consent_recorded_at?: string | null
           created_at?: string
           expires_at?: string | null
           fx_rate_snapshot_micros?: number
@@ -145,6 +153,7 @@ export type Database = {
           guest_price_usd_cents?: number
           headcount?: number
           id?: string
+          marketing_consent?: boolean
           nationality?: string
           owner_share_piasters?: number
           platform_share_piasters?: number

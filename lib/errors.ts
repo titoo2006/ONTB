@@ -78,6 +78,47 @@ export const AppError = {
     ),
   },
 
+  PAYMENT: {
+    /**
+     * SECURITY.md §1 — rejected AND logged, never silently dropped. A run of
+     * these is either an attack or a misconfiguration; both need to be visible.
+     */
+    WEBHOOK_SIGNATURE_INVALID: define(
+      "PAYMENT.WEBHOOK_SIGNATURE_INVALID",
+      "Webhook signature verification failed.",
+      "unexpected",
+    ),
+    WEBHOOK_NOT_IMPLEMENTED: define(
+      "PAYMENT.WEBHOOK_NOT_IMPLEMENTED",
+      "The payment webhook is not yet implemented.",
+      "expected",
+    ),
+    /** An amount mismatch is tampering or a bug. Never quietly accepted. */
+    WEBHOOK_AMOUNT_MISMATCH: define(
+      "PAYMENT.WEBHOOK_AMOUNT_MISMATCH",
+      "Webhook amount did not match the booking. Flagged for manual review.",
+      "unexpected",
+    ),
+  },
+
+  EMAIL: {
+    /**
+     * No transport chosen yet (context.md §8). Never fail a payment webhook on
+     * this: a guest whose payment succeeded and whose email bounced still has a
+     * valid booking, retrievable from the site.
+     */
+    PROVIDER_NOT_CONFIGURED: define(
+      "EMAIL.PROVIDER_NOT_CONFIGURED",
+      "No email provider is configured.",
+      "expected",
+    ),
+    SEND_FAILED: define(
+      "EMAIL.SEND_FAILED",
+      "The confirmation email could not be sent.",
+      "expected",
+    ),
+  },
+
   FX: {
     /**
      * No usable rate row exists. Checkout cannot price a booking in EGP, so this
@@ -100,6 +141,50 @@ export const AppError = {
       "FX.RATE_STALE",
       "The exchange rate has not been reviewed recently.",
       "expected",
+    ),
+  },
+
+  ORGANIZER: {
+    SIGN_IN_FAILED: define(
+      "ORGANIZER.SIGN_IN_FAILED",
+      "Those sign-in details didn't work.",
+      "expected",
+    ),
+    LOOKUP_FAILED: define(
+      "ORGANIZER.LOOKUP_FAILED",
+      "Could not load that information.",
+      "unexpected",
+    ),
+    BOOKING_NOT_FOUND: define(
+      "ORGANIZER.BOOKING_NOT_FOUND",
+      "Booking code not found.",
+      "expected",
+    ),
+    /** PRD Screen 7 — show who and when, offer no duplicate action. */
+    ALREADY_CHECKED_IN: define(
+      "ORGANIZER.ALREADY_CHECKED_IN",
+      "This booking is already checked in.",
+      "expected",
+    ),
+    NOT_CHECKINABLE: define(
+      "ORGANIZER.NOT_CHECKINABLE",
+      "This booking has expired or been cancelled.",
+      "expected",
+    ),
+    NOT_CONFIRMED: define(
+      "ORGANIZER.NOT_CONFIRMED",
+      "This booking has not been paid for.",
+      "expected",
+    ),
+    NOT_AUTHORIZED: define(
+      "ORGANIZER.NOT_AUTHORIZED",
+      "This booking is not for your yacht.",
+      "expected",
+    ),
+    CHECK_IN_FAILED: define(
+      "ORGANIZER.CHECK_IN_FAILED",
+      "Check-in didn't go through. Please try again.",
+      "unexpected",
     ),
   },
 
@@ -145,6 +230,19 @@ export const AppError = {
   },
 
   BOOKING: {
+    TICKET: {
+      /**
+       * Deliberately one code for every failure mode — wrong email, unknown
+       * code, expired token. Distinguishing them would confirm whether a
+       * stranger's booking exists (SECURITY.md §2).
+       */
+      ACCESS_DENIED: define(
+        "BOOKING.TICKET.ACCESS_DENIED",
+        "We couldn't find a booking matching those details.",
+        "expected",
+      ),
+    },
+
     CHECKOUT: {
       // PRD_Phase1.md Screen 3
       CAPACITY_EXCEEDED: define(

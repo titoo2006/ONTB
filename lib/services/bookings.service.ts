@@ -2,6 +2,7 @@ import "server-only";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import { AppError, appError } from "@/lib/errors";
 import { generateBookingCode } from "@/lib/booking-code";
+import type { BookingStatus } from "@/types/domain";
 
 const FILE = "lib/services/bookings.service.ts";
 
@@ -25,6 +26,122 @@ const FILE = "lib/services/bookings.service.ts";
  * Service-role client, because SECURITY.md §3 gives guests no direct table
  * access and the reservation function is granted to service_role alone.
  */
+
+export interface BookingStatusView {
+  status: BookingStatus;
+  /** Null until the webhook confirms — Screen 4 polls for it to become set. */
+  confirmedAt: string | null;
+}
+
+export interface TicketView {
+  bookingCode: string;
+  guestName: string;
+  guestEmail: string;
+  headcount: number;
+  status: BookingStatus;
+  yachtName: string;
+  tripDate: string;
+  departureTime: string;
+  guestPriceUsdCents: number;
+  chargedAmountPiasters: number;
+}
+
+/**
+ * Status only, by booking code — for the Screen 4 polling page.
+ *
+ * Deliberately returns NO personal data. SECURITY.md §2 says a booking code
+ * alone must not expose a stranger's name, phone, or trip, and this endpoint is
+ * reachable with just a code. A status value on its own leaks nothing useful.
+ * The ticket itself requires a second factor; see getBookingForTicket.
+ */
+export async function getBookingStatusByCode(
+  bookingCode: string,
+): Promise<BookingStatusView | null> {
+  const supabase = createSupabaseServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("status, updated_at")
+    .eq("booking_code", bookingCode)
+    .limit(1);
+
+  if (error) {
+    throw appError(
+      AppError.BOOKING.CHECKOUT.CREATE_FAILED,
+      FILE,
+      "getBookingStatusByCode",
+    );
+  }
+
+  const row = data?.[0];
+  if (!row) return null;
+
+  return {
+    status: row.status,
+    confirmedAt: row.status === "confirmed" ? row.updated_at : null,
+  };
+}
+
+/**
+ * The full ticket, including PII.
+ *
+ * CALLERS MUST HAVE ALREADY PROVEN THE SECOND FACTOR — a valid signed token or a
+ * matching booking email (SECURITY.md §2). This function does not check that,
+ * because it cannot: it has no idea how the caller arrived. The gate lives in
+ * lib/actions/booking.actions.ts, and there must be exactly one way in.
+ */
+export async function getBookingForTicket(
+  bookingCode: string,
+): Promise<TicketView | null> {
+  const supabase = createSupabaseServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(
+      "booking_code, guest_name, guest_email, headcount, status, guest_price_usd_cents, charged_amount_piasters, trip_instance_id",
+    )
+    .eq("booking_code", bookingCode)
+    .limit(1);
+
+  if (error) {
+    throw appError(
+      AppError.BOOKING.CHECKOUT.CREATE_FAILED,
+      FILE,
+      "getBookingForTicket",
+    );
+  }
+
+  const booking = data?.[0];
+  if (!booking) return null;
+
+  const { data: tripRows } = await supabase
+    .from("trip_instances")
+    .select("trip_date, departure_time, yacht_id")
+    .eq("id", booking.trip_instance_id)
+    .limit(1);
+
+  const trip = tripRows?.[0];
+  if (!trip) return null;
+
+  const { data: yachtRows } = await supabase
+    .from("yachts")
+    .select("name")
+    .eq("id", trip.yacht_id)
+    .limit(1);
+
+  return {
+    bookingCode: booking.booking_code,
+    guestName: booking.guest_name,
+    guestEmail: booking.guest_email,
+    headcount: booking.headcount,
+    status: booking.status,
+    yachtName: yachtRows?.[0]?.name ?? "",
+    tripDate: trip.trip_date,
+    departureTime: trip.departure_time,
+    guestPriceUsdCents: booking.guest_price_usd_cents,
+    chargedAmountPiasters: booking.charged_amount_piasters,
+  };
+}
 
 /** SECURITY.md §5 — unpaid holds are released quickly so seats aren't hoarded. */
 export const PENDING_PAYMENT_HOLD_MINUTES = 15;

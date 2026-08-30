@@ -76,3 +76,57 @@ export async function createPaymentIntent(
     "createPaymentIntent",
   );
 }
+
+/**
+ * Verify the webhook's HMAC signature — SECURITY.md §1, P0.
+ *
+ * NOT IMPLEMENTED — returns false, so nothing is ever confirmed by an
+ * unverified callback. Failing CLOSED is the only acceptable stub here: a
+ * placeholder that returned true would confirm bookings for anyone who could
+ * POST to the endpoint.
+ *
+ * Paymob's scheme is not guessed at here. When the docs and secret are in hand:
+ * they concatenate a documented, ORDER-SPECIFIC subset of callback fields, HMAC
+ * it with SHA-512 using PAYMOB_HMAC_SECRET, and send the hex digest (as an `hmac`
+ * query parameter on the callback URL, in their current integration). The exact
+ * field list and order are the whole security property — a wrong order verifies
+ * nothing while appearing to work — so it must come from their documentation,
+ * not from memory.
+ *
+ * Compare with timingSafeEqual, never `===`.
+ */
+export function verifyPaymobHmac(
+  _rawBody: string,
+  _headers: Headers,
+): boolean {
+  return false;
+}
+
+/** The fields we need off a Paymob callback, once its shape is confirmed. */
+export interface PaymobCallback {
+  /** Our booking id, sent as merchant_order_id at intent creation. */
+  merchantOrderId: string;
+  /** Paymob's own transaction id — stored as payments.gateway_reference. */
+  transactionId: string;
+  /** Amount in piasters, compared against the pending_payment row. */
+  amountPiasters: number;
+  success: boolean;
+  /** Kept whole in payments.raw_gateway_response for later investigation. */
+  raw: unknown;
+}
+
+/**
+ * NOT IMPLEMENTED — field names deliberately not guessed at.
+ *
+ * Paymob's callback is a nested object whose exact keys differ between their
+ * transaction callback and their response callback. Inventing key names would
+ * produce code that parses to `undefined` and silently fails to confirm real
+ * bookings — a stub that throws is far safer than one that looks right.
+ */
+export function parsePaymobCallback(_rawBody: string): PaymobCallback {
+  throw appError(
+    AppError.PAYMENT.WEBHOOK_NOT_IMPLEMENTED,
+    FILE,
+    "parsePaymobCallback",
+  );
+}

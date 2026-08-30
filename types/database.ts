@@ -344,6 +344,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_in_booking: {
+        Args: {
+          p_booking_code: string
+        }
+        Returns: {
+          booking_id: string
+          booking_code: string
+          guest_name: string
+          headcount: number
+          checked_in_at: string
+        }[]
+      }
       is_active_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

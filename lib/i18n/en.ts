@@ -179,8 +179,128 @@ export const en = {
     errorBody: "Nothing has been charged. Please try again.",
   },
 
-  ticket: {},
-  organizer: {},
+  payment: {
+    confirmingTitle: "Confirming your payment…",
+    confirmingBody:
+      "This usually takes a few seconds. Please don't close this page.",
+
+    failedTitle: "Your payment didn't go through",
+    failedBody: "You have not been charged. You can try booking again.",
+    failedCta: "Back to sailings",
+
+    /**
+     * PRD_Phase1.md Screen 4 — a timeout is NOT a failure and must not read like
+     * one. The webhook may simply be slow; the booking may well confirm a moment
+     * later, and telling the guest it failed would be wrong.
+     */
+    timeoutTitle: "Still confirming your booking",
+    timeoutBody:
+      "Your payment is being processed. We'll email your ticket as soon as it's confirmed — there's no need to pay again.",
+    timeoutCta: "Check your email",
+
+    expiredTitle: "This booking expired before payment",
+    expiredBody:
+      "The seats were released. You have not been charged — please book again.",
+  },
+
+  ticket: {
+    pageTitle: "Your ticket",
+    bookingCodeLabel: "Booking code",
+    qrAlt: "QR code containing your booking code",
+    yachtLabel: "Yacht",
+    dateLabel: "Date",
+    departureLabel: "Departure",
+    cairoTimeLabel: "Departure (Cairo time)",
+    cairoTimeNote: "local time in Egypt",
+    guestsLabel: "Guests",
+    totalLabel: "Total paid",
+    statusLabel: "Status",
+
+    showAtBoarding:
+      "Show this booking code or QR code at the yacht boarding point. One code covers everyone in your booking.",
+    arriveEarly: "Please arrive in good time before departure.",
+
+    /** context.md §9 — stated on the ticket as well as before payment. */
+    noRefundNotice:
+      "If you don't check in within 30 minutes of departure, your booking expires and no refund is given.",
+
+    printLabel: "Print this ticket",
+
+    // Second-factor gate — SECURITY.md §2
+    gateTitle: "View your ticket",
+    gateBody:
+      "For your privacy, please enter the email address you used when booking.",
+    gateEmailLabel: "Email address",
+    gateSubmit: "View ticket",
+    gateChecking: "Checking…",
+    gateDenied:
+      "We couldn't find a booking matching those details. Please check the booking code and email address.",
+
+    // Email
+    emailSubject: "Your Nile dinner cruise ticket",
+    emailGreeting: (name: string) => `Hello ${name},`,
+    emailIntro:
+      "Your booking is confirmed. Here is your ticket — you'll need the booking code below at the boarding point.",
+    viewTicketLabel: "View your ticket online",
+  },
+
+  /**
+   * Organizer screens — English, confirmed 2026-08-30 with the client: their
+   * boarding staff work in English day to day (CLAUDE.md Rule 13 required this
+   * be confirmed rather than assumed). LTR only; no RTL support is built.
+   */
+  organizer: {
+    signInTitle: "Organizer sign in",
+    signInBody: "Sign in to check guests in at the boarding point.",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    signInButton: "Sign in",
+    signingIn: "Signing in…",
+    signInError: "Those sign-in details didn't work. Please try again.",
+    signOut: "Sign out",
+
+    searchTitle: "Check in",
+    searchLabel: "Booking code",
+    searchPlaceholder: "e.g. 7GZX594C",
+    searchButton: "Find booking",
+    searching: "Searching…",
+
+    todayHeading: "Today's sailings",
+    todayEmpty: "No sailings scheduled today.",
+    expectedLabel: "Expected",
+    checkedInLabel: "Checked in",
+
+    notFoundTitle: "Booking code not found",
+    notFoundBody: "Double-check the code and try again.",
+
+    guestLabel: "Guest",
+    guestsLabel: "Guests",
+    yachtLabel: "Yacht",
+    departureLabel: "Departure",
+    statusLabel: "Status",
+
+    checkInButton: (count: number) =>
+      `Check in ${count} ${count === 1 ? "guest" : "guests"}`,
+    checkingIn: "Checking in…",
+
+    successTitle: "Checked in",
+    successBody: (count: number, name: string) =>
+      `${count} ${count === 1 ? "guest" : "guests"} — ${name}`,
+    nextBooking: "Next booking",
+
+    alreadyTitle: "Already checked in",
+    alreadyBody: (when: string) => `Checked in at ${when}.`,
+
+    expiredTitle: "Cannot check in",
+    expiredBody:
+      "This booking has expired or been cancelled. Contact the office — there is no override on this screen.",
+    unpaidBody:
+      "This booking was never paid for, so it cannot board. Contact the office.",
+
+    errorTitle: "Something went wrong",
+    errorBody: "Please try again.",
+    retry: "Try again",
+  },
   admin: {},
 
   consent: {

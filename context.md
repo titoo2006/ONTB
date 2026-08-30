@@ -211,6 +211,20 @@ Every one of them was surfaced while drafting the Terms and Privacy pages
 resolve any of them by guessing — that is exactly how a policy gets created by
 accident.
 
+- **Confirmation email is DISABLED pending a sending domain** (decided
+  2026-08-30). `sendEmail` logs and returns; nothing is sent. The composition —
+  subject, HTML, plain text, QR — is written and typechecked, so enabling it is
+  a one-function change. What is missing is not a provider but a **domain**:
+  guests booked with the client's brand, so mail must come from the client's
+  domain with SPF, DKIM and DMARC configured, which needs DNS access from the
+  client. Domain authentication affects inbox placement more than the choice of
+  provider does. Deliberately does not block launch discussion — the ticket
+  screen stands alone, and a guest can always reach their ticket on the site —
+  but a launch without it means every guest must keep the browser tab or the
+  booking code themselves, which is worth deciding consciously rather than by
+  default. Provider recommendation on file: Resend for speed, Postmark if
+  deliverability is the priority; verify current pricing and EU data residency
+  before signing.
 - **The seeded FX rate is a placeholder. Someone must insert a real,
   deliberately sourced rate before accepting real payments.** `supabase/seed.sql`
   inserts `48750000` (48.75 EGP/USD) purely so local development can convert at
@@ -350,6 +364,23 @@ Format: date — decision — why.
 Things we have investigated, understood, and consciously decided to live with.
 They are recorded here so nobody rediscovers and re-investigates them. These are
 **not** §8 open questions — no decision is pending.
+
+### 10.0 OPEN GAP — `/admin/*` returns 200 to unauthenticated callers
+**Must close when Screens 9–10 are built. Not an accepted limitation.**
+
+`/organizer/*` correctly returns 404 to anyone who is not an active organizer
+(Rule 10 — we do not confirm a protected route exists). `/admin/*` does not: it
+returns **200**, because the admin pages are still stubs that render `null` and
+have no guard.
+
+Harmless today — the pages contain nothing, so nothing leaks — but it confirms
+the route exists, which Rule 10 forbids. Deferred deliberately (2026-08-30)
+rather than patched, because the guard belongs with the real page and would
+otherwise be written twice.
+
+**When building Screens 9–10:** every admin page calls an admin-identity check
+and `notFound()` on failure, exactly as `getOrganizerIdentity()` is used on the
+organizer screens, and the report must state the resulting status codes.
 
 ### 10.1 `notFound()` returns HTTP 200 on guest routes
 **Decided 2026-08-30 — accepted, not fixed.**

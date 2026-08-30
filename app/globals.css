@@ -127,3 +127,46 @@ body {
   font-size: 18px;
   white-space: nowrap;
 }
+
+/**
+ * Printing the ticket.
+ *
+ * Phase 1 has no PDF generator by decision: every phone can "save as PDF" from
+ * a print dialogue, and the two things that matter at the boarding point are the
+ * booking code and the QR. A styled PDF is a Phase 2 nicety, not a blocker.
+ *
+ * The rules below exist because a browser's default print of a web page is
+ * genuinely bad: it carries navigation, prints link URLs in brackets, and can
+ * drop background colours — including, critically, the dark panel behind the
+ * booking code, which would print white-on-white.
+ */
+@media print {
+  /* Chrome/Safari drop backgrounds unless asked. The code panel and the QR's
+     quiet zone both depend on theirs. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  /* Keep the whole ticket on one sheet — a QR split across a page break is
+     unscannable, which would defeat the point entirely. */
+  .print-ticket {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #c9bfa5 !important;
+    max-width: 100% !important;
+  }
+
+  @page {
+    margin: 16mm;
+  }
+}

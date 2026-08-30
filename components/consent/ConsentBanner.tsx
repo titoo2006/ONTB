@@ -67,7 +67,7 @@ export function ConsentBanner() {
       role="dialog"
       aria-modal="false"
       aria-label={en.consent.title}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface shadow-overlay"
+      className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface shadow-overlay"
     >
       <div className="mx-auto max-w-content px-4 py-6 md:px-6">
         <h2 className="text-lg font-semibold text-text-primary">

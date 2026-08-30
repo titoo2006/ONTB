@@ -132,6 +132,23 @@ export const AppError = {
         "The booking details submitted are not valid.",
         "expected",
       ),
+      /**
+       * TEMPORARY — the checkout path is complete up to the booking row and
+       * stops here.
+       *
+       * A booking cannot be created without an FX rate: charged_amount_piasters
+       * and fx_rate_snapshot_micros are NOT NULL, and Paymob requires the amount
+       * in piasters at handoff so neither can be deferred to the webhook. There
+       * is no partial insert. Paymob credentials are also outstanding.
+       *
+       * Delete this code once the FX rate source is decided (context.md §8) and
+       * createPendingBooking is implemented.
+       */
+      PAYMENT_UNAVAILABLE: define(
+        "BOOKING.CHECKOUT.PAYMENT_UNAVAILABLE",
+        "Online payment isn't available yet.",
+        "expected",
+      ),
     },
   },
 } as const;

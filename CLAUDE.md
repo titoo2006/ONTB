@@ -160,11 +160,19 @@ smallest unit of the storage currency:
 
 Never use `parseFloat`, `toFixed`, or decimal arithmetic on money values.
 
-Every booking snapshots, at creation time: `guest_price_usd_cents`, the EGP amount
-actually charged (`charged_amount_piasters`), the FX rate used, and the computed split
-(`owner_share_piasters`, `platform_share_piasters`). These are **written once at booking
-time and never recalculated later** — if the commission rule or FX rate changes
+Every booking snapshots, at creation time, exactly three money fields:
+`guest_price_usd_cents` (the quoted **per-guest** price — multiply by `headcount` for
+the total, which is not stored separately), `charged_amount_piasters` (what the gateway
+actually charged, in full), and `fx_rate_snapshot_micros` (the rate used). These are
+**written once at booking time and never recalculated later** — if the FX rate changes
 tomorrow, past bookings must not silently change value.
+
+There is **no per-booking revenue split and no commission field** (amended 2026-08-30,
+superseding the original `owner_share_piasters` / `platform_share_piasters`
+requirement). The full guest payment settles into the client's single account; the
+platform's $30 per guest is collected separately and offline by contract and never
+passes through this system. Commission is a reporting calculation over `headcount`
+against a constant — never a column, and never a division of a charge.
 
 `Math.round()` once, at the point of calculation. Never round twice.
 

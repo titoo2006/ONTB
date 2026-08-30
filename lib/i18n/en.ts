@@ -131,6 +131,52 @@ export const en = {
     // DESIGN.md §8 / Rule 13 — this disclosure must be legible next to the price,
     // never buried in fine print at a smaller size.
     egpDisclosure: "Charged in EGP at checkout",
+
+    pageTitle: "Complete your booking",
+    summaryHeading: "Your booking",
+    yachtLabel: "Yacht",
+    dateLabel: "Date",
+    departureLabel: "Departure",
+    durationLabel: "Duration",
+    guestsLabel: "Guests",
+    perGuestLabel: "Price per guest",
+    totalLabel: "Total",
+
+    detailsHeading: "Your details",
+    detailsBody:
+      "We'll send your ticket to this email address. Please double-check it.",
+    nameLabel: "Full name",
+    namePlaceholder: "As you'd like it on the ticket",
+    emailLabel: "Email address",
+    phoneLabel: "Phone number",
+    phoneHint: "In case we need to reach you about your sailing.",
+    nationalityLabel: "Nationality",
+    nationalityPlaceholder: "Select your nationality",
+
+    payButton: (total: string) => `Pay ${total}`,
+    paying: "Taking you to payment…",
+
+    /**
+     * context.md §9 — the no-refund rule must be stated clearly BEFORE payment,
+     * not only afterwards on the ticket. This sits directly above the pay button.
+     */
+    policyHeading: "Before you pay",
+    policyNoRefund:
+      "If you don't check in within 30 minutes of departure, your booking expires and no refund is given.",
+    policyTerms: "By paying you accept our terms and conditions.",
+    policyTermsLink: "Read the terms",
+
+    soldOutTitle: "Sorry, this trip just sold out",
+    soldOutBody:
+      "The last seats went while you were filling this in. Nothing has been charged.",
+    backToTrip: "Choose another sailing",
+
+    invalidTitle: "We couldn't start that booking",
+    invalidBody:
+      "The link may be incomplete or out of date. Please pick your sailing again.",
+
+    errorTitle: "Something went wrong",
+    errorBody: "Nothing has been charged. Please try again.",
   },
 
   ticket: {},

@@ -109,8 +109,6 @@ export type Database = {
           id: string
           marketing_consent: boolean
           nationality: string
-          owner_share_piasters: number
-          platform_share_piasters: number
           status: Database["public"]["Enums"]["booking_status"]
           trip_instance_id: string
           updated_at: string
@@ -132,8 +130,6 @@ export type Database = {
           id?: string
           marketing_consent?: boolean
           nationality: string
-          owner_share_piasters: number
-          platform_share_piasters: number
           status?: Database["public"]["Enums"]["booking_status"]
           trip_instance_id: string
           updated_at?: string
@@ -155,8 +151,6 @@ export type Database = {
           id?: string
           marketing_consent?: boolean
           nationality?: string
-          owner_share_piasters?: number
-          platform_share_piasters?: number
           status?: Database["public"]["Enums"]["booking_status"]
           trip_instance_id?: string
           updated_at?: string

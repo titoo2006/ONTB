@@ -88,8 +88,17 @@ reconciliation report (§4).
 ## 4. MONEY & COMMISSION MODEL
 
 - Guest-facing ticket price: **$95 USD** per person.
-- Revenue split per ticket, per the partnership contract: **$65 to the client
+- Commercial split per ticket, per the partnership contract: **$65 to the client
   (yacht owner)**, **$30 to the platform (us)**.
+- **The $30 commission never touches this system** (decided 2026-08-30). The full
+  $95 per guest, converted to EGP, settles into the **client's** single Paymob
+  account. Our commission is collected separately and offline under the
+  partnership contract. It is never calculated, split, held, or snapshotted
+  anywhere in the booking flow, and there is no column for it.
+- The admin commission reconciliation report is therefore a pure reporting
+  calculation — `sum(headcount) × $30 contract rate` — using a constant in code.
+  It reports what is owed under the contract; it does not reflect money this
+  system has moved, because this system moves none of it.
 - The client's prior per-ticket revenue via offline trip offices was roughly
   equivalent to $40 (≈2,000 EGP); the online channel is a real increase for them
   ($65), not just a volume play.
@@ -163,9 +172,9 @@ RLS policy design):
 - `trip_instances` — id, yacht_id, date, departure_time, status
 - `bookings` — id, booking_code, trip_instance_id, guest_name, guest_email,
   guest_phone, nationality, headcount, guest_price_usd_cents,
-  charged_amount_piasters, fx_rate_snapshot, owner_share_piasters,
-  platform_share_piasters, status (`pending_payment` / `confirmed` / `checked_in` /
-  `expired` / `cancelled`), created_at, checked_in_at, expires_at
+  charged_amount_piasters, fx_rate_snapshot_micros, status (`pending_payment` /
+  `confirmed` / `checked_in` / `expired` / `cancelled`), analytics_consent,
+  marketing_consent, consent_recorded_at, created_at, checked_in_at, expires_at
 - `payments` — id, booking_id, gateway, gateway_reference, amount_piasters, status,
   raw_gateway_response
 - `organizer_users` — id, user_id (Supabase auth), assigned_yacht_id (nullable = all),
@@ -239,7 +248,43 @@ Format: date — decision — why.
   window is purely an operational cutoff (releases the seat for reporting purposes),
   not a financial transaction — no refund logic needed against the payment gateway
   for this case. Must be stated clearly in checkout terms before payment.
-- **2026-08-29** — **Commission split rounding: convert once, then split.** The USD
+- **2026-08-30** — **SUPERSEDES the 2026-08-29 commission-split-rounding entry
+  below. There is no per-booking revenue split, and no commission field either.**
+  The full $95 per guest, converted to EGP, settles into the client's single
+  Paymob account. The platform's $30 is collected separately and offline by
+  contract and never passes through this system at all.
+
+  Why: the money never moves in two directions here, so modelling a division was
+  inventing complexity to mirror an accounting arrangement rather than a payment
+  flow.
+
+  A `platform_commission_usd_cents` snapshot column was proposed and **rejected**
+  during this same discussion. The argument for it — protecting past months from
+  a future contract renegotiation — is sound in general, but snapshotting a rate
+  is only worth doing for money the system actually handles, and this system
+  handles none of the commission. Recording it would have implied a per-booking
+  financial fact that does not exist.
+
+  Consequences: the `booking_split_sums_to_charge` constraint and the
+  `owner_share_piasters` / `platform_share_piasters` columns are dropped; no
+  commission column is added; the convert-once-then-split rounding rule is void,
+  because there is no division and therefore no remainder piaster to assign. A
+  booking's money fields are now exactly three: `guest_price_usd_cents` (per
+  guest), `charged_amount_piasters`, `fx_rate_snapshot_micros`. Commission
+  reconciliation is `sum(headcount) × $30` from a constant. CLAUDE.md Rule 8
+  amended accordingly.
+- **2026-08-30** — **We own the USD→EGP rate; Paymob does not convert for us.**
+  Paymob is EGP-denominated and both its order-registration and payment-key calls
+  require `amount_cents` in piasters, so the EGP figure must exist before handoff.
+  Consequences: `charged_amount_piasters` and `fx_rate_snapshot_micros` stay
+  NOT NULL and are written at booking creation — making them nullable "until the
+  webhook tells us" was considered and rejected, because SECURITY.md §1 compares
+  the webhook's amount against the amount stored on the `pending_payment` row,
+  and a null there would silently disable that tampering check. The only
+  conversion we do not control is the guest's own card issuer converting EGP into
+  their home currency, which we never see and do not need to.
+- **2026-08-29** — **(SUPERSEDED 2026-08-30 — see above. Retained for history.)**
+  **Commission split rounding: convert once, then split.** The USD
   total is converted to EGP a single time, and that converted EGP total is split
   65/30. Any remainder piaster goes to the **owner**. Why: the two shares then always
   sum to the amount actually charged, so reconciliation against Paymob's settlement

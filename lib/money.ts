@@ -8,22 +8,32 @@
  * Never `parseFloat`, `toFixed`, or decimal arithmetic on a money value.
  * `Math.round()` exactly once, at the point of calculation — never round twice.
  *
- * ROUNDING RULE — decided 2026-08-29 (context.md §9). Not negotiable per-call site:
- *   1. Convert the USD total to EGP piasters ONCE. Round once, here, and nowhere else.
- *   2. Split that converted total 65/30 — never convert $65 and $30 separately.
- *   3. Any remainder piaster goes to the OWNER.
- * The two shares therefore always sum to charged_amount_piasters exactly, which the
- * database enforces via `booking_split_sums_to_charge`. Reconciliation against
- * Paymob's settlement is then exact, with no month-end drift to explain.
+ * NO SPLIT, NO COMMISSION FIELD (decided 2026-08-30, context.md §9). The full
+ * $95 per guest, converted to EGP, settles into the client's single Paymob
+ * account. The platform's $30 is collected separately and offline by contract and
+ * never passes through this system. Nothing here divides a charge, and no
+ * commission value is written to any booking. The earlier
+ * convert-once-then-split-65/30 rounding rule is void — there is no division and
+ * therefore no remainder piaster to assign.
  *
- * SCAFFOLD STUB — the rule is fixed; the implementation lands with Screen 3.
+ * A booking's money fields are exactly three: guest_price_usd_cents (per guest),
+ * charged_amount_piasters, fx_rate_snapshot_micros.
  */
 
-/** context.md §4 — guest-facing price, quoted in USD. */
+/**
+ * context.md §4 — guest-facing price, quoted in USD, PER GUEST.
+ * The booking total is this × headcount and is never stored separately.
+ */
 export const GUEST_PRICE_USD_CENTS = 9500;
 
-/** context.md §4 — contractual split of the $95 ticket. */
-export const OWNER_SHARE_USD_CENTS = 6500;
+/**
+ * The contractual commission per guest — a REPORTING CONSTANT ONLY.
+ *
+ * Used by the admin reconciliation report (`sum(headcount) × this`) and by the
+ * Meta `platform_margin_usd` property. It is never written to a booking, never
+ * deducted from a charge, and never reflects money this system has moved — the
+ * commission is settled offline (context.md §4).
+ */
 export const PLATFORM_SHARE_USD_CENTS = 3000;
 
 /**
@@ -48,5 +58,7 @@ export function formatUsdCents(cents: number): string {
   return negative ? `-${body}` : body;
 }
 
-// TODO: convertUsdCentsToPiasters() and splitChargeIntoShares(), implementing the
-// rounding rule above. Unblocked — build with Screen 3 (checkout).
+// TODO: convertUsdCentsToPiasters(), the single USD->EGP conversion used at
+// checkout handoff. Blocked only on the FX rate source and buffer being agreed
+// (context.md §8). Paymob requires piasters at handoff, so this cannot be
+// deferred to the webhook — see the 2026-08-30 decision-log entry.

@@ -256,7 +256,23 @@ inspector_port = 8083
 # entrypoint = "./functions/MY_FUNCTION_NAME/index.ts"
 
 [analytics]
-enabled = true
+# Disabled 2026-08-31. This is Supabase's own local log pipeline (Logflare +
+# vector) — unrelated to lib/analytics, which is PostHog and the Meta Pixel.
+#
+# Why off: vector's docker_logs source is pointed by the CLI at
+# DOCKER_HOST=http://host.docker.internal:2375, Docker's unencrypted TCP daemon
+# port. Docker Desktop disables that port by default, so the connection is
+# refused, vector's sources all finish, it exits 0, and `restart: always` loops
+# it forever.
+#
+# The commonly suggested fix — enabling "Expose daemon on tcp://localhost:2375
+# without TLS" — is a security downgrade we are not taking: it grants
+# unauthenticated, root-equivalent control of Docker to any local process.
+#
+# Nothing in this project reads these logs. `docker logs <container>` and
+# Supabase Studio both work without them. Turning it off removes the broken
+# container and shortens `supabase start`.
+enabled = false
 port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"

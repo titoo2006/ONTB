@@ -56,14 +56,38 @@ npm run dev
 
 ## Database changes
 
-Rule 19 — migrations go through the CLI and get applied for real:
+Rule 19 — migrations go through the CLI and get applied for real. Prove every
+change against the local stack before it reaches a real project:
 
 ```bash
-supabase migration new <name>   # write the SQL by hand
-# rehearse against a dev branch inside begin; ... rollback; first
-supabase db push
-npm run db:types                # regenerate types/database.ts
+# 1. Start the local stack (needs Docker Desktop running)
+npx supabase start
+
+# 2. Write the migration by hand
+npx supabase migration new <name>
+
+# 3. Rehearse it — must end in ROLLBACK with no errors
+{ echo "begin;"; cat supabase/migrations/<file>.sql; echo "rollback;"; } \
+  | docker exec -i supabase_db_ONTB psql -v ON_ERROR_STOP=1 -U postgres -d postgres
+
+# 4. Apply locally for real, re-running migrations + seed from scratch
+npm run db:reset
+
+# 5. Regenerate types from the LOCAL database
+npm run db:types:local
+
+# 6. Only once it is proven locally, push to the linked cloud project
+npm run db:push
+npm run db:types                # regenerates from the linked project
 ```
+
+`db:types` (`--linked`) targets the real cloud project; `db:types:local`
+(`--local`) targets the local stack. Both overwrite `types/database.ts`, which is
+generated and never hand-edited.
+
+Local endpoints: API `http://127.0.0.1:54321`, Studio `http://127.0.0.1:54323`,
+Inbucket (captured emails) `http://127.0.0.1:54324`. Copy the anon and service
+role keys from `npx supabase status` into `.env.local`.
 
 Never apply a schema change through an ad-hoc console query that isn't captured in
 a committed migration file.

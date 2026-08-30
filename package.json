@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "db:new": "supabase migration new",
     "db:push": "supabase db push",
-    "db:types": "supabase gen types typescript --linked > types/database.ts"
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --linked > types/database.ts",
+    "db:types:local": "supabase gen types typescript --local > types/database.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

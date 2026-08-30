@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { trackPageView } from "@/lib/analytics/client";
 
 /**
@@ -12,12 +12,16 @@ import { trackPageView } from "@/lib/analytics/client";
  * From then on, App Router navigations don't reload the page, so each route
  * change needs an explicit event.
  *
- * No consent check here: without consent the snippet was never injected, so
+ * Tracks `usePathname` only, NOT `useSearchParams`: a query-string change on the
+ * listing is a date filter, not a new page. Counting every filter click as a
+ * PageView would inflate the metric and tell us nothing. Dropping it also
+ * removes the Suspense boundary useSearchParams would otherwise require.
+ *
+ * No consent check: without consent the snippet was never injected, so
  * `window.fbq` does not exist and trackPageView is already a no-op.
  */
 export function PageViewTracker() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export function PageViewTracker() {
       return;
     }
     trackPageView();
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return null;
 }

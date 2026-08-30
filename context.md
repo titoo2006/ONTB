@@ -18,6 +18,7 @@
 7. Database Schema (Phase 1)
 8. Open Decisions / Not Yet Answered
 9. Decision Log
+10. Known Limitations (accepted, not open questions)
 
 ---
 
@@ -193,6 +194,35 @@ rather than assuming:
 - **Group/tour-operator bulk bookings** — do travel agents get a different booking
   path (e.g. a bulk-booking or affiliate flow) or do they use the same guest checkout?
 
+### 8.1 BLOCKING FOR LAUNCH — not blocking Phase 1 development
+
+These do not stop screens being built. They **do** stop real money being taken.
+Every one of them was surfaced while drafting the Terms and Privacy pages
+(2026-08-30) and each is currently a visible review flag on those pages. Do not
+resolve any of them by guessing — that is exactly how a policy gets created by
+accident.
+
+- **Operator cancellation policy.** What happens when *we* cancel a sailing —
+  weather, river conditions, safety — is undefined. It cannot inherit the
+  no-show rule: a guest who arrives for a cancelled cruise has plainly not
+  no-showed, so "no refund" would be indefensible. Terms §7 is deliberately
+  left incomplete until this is decided.
+- **Privacy policy promises erasure; append-only bookings can't currently honor
+  it — needs an anonymization design or a policy rewrite before real payments go
+  live.** Rule 9 makes bookings append-only and tax retention requires keeping
+  the financial record, yet the privacy policy grants a deletion right. The
+  likely resolution is anonymising the guest PII fields while preserving the
+  booking and payment rows, but that is a design decision nobody has made. Until
+  then the policy promises something the system cannot do.
+- **Meta US data-transfer safeguard paragraph.** Meta processes in the US and
+  transfers out of the EEA need a stated legal safeguard. **A lawyer is writing
+  this — do not draft it.** The flag stays visible on the privacy page until
+  their copy replaces it.
+- **Governing law and EU consumer override.** Terms currently assume Egyptian
+  law. Consumer-protection rules in a guest's home country can override a
+  choice-of-law clause, and ~90% of guests are foreign tourists. **A lawyer is
+  writing this — do not draft it.**
+
 ---
 
 ## 9. DECISION LOG
@@ -240,3 +270,36 @@ Format: date — decision — why.
   yacht (never hardcoded), but a later refit must not retroactively change the
   capacity of a trip that already ran — which would make historical trips look
   oversold.
+
+---
+
+## 10. KNOWN LIMITATIONS (accepted, not open questions)
+
+Things we have investigated, understood, and consciously decided to live with.
+They are recorded here so nobody rediscovers and re-investigates them. These are
+**not** §8 open questions — no decision is pending.
+
+### 10.1 `notFound()` returns HTTP 200 on guest routes
+**Decided 2026-08-30 — accepted, not fixed.**
+
+A missing or already-sailed trip renders the correct 404 page, but with an HTTP
+**200** status. Unmatched routes (e.g. `/nonexistent`) still return a correct
+404; this affects only `notFound()` called from inside a guest page.
+
+*Cause:* the guest layout calls `cookies()` to gate the consent scripts, which
+makes every guest route dynamically rendered and streamed. A streamed response
+has already committed its HTTP status by the time `notFound()` runs. The root
+layout reads no cookies, which is why unmatched routes are unaffected.
+
+*Already tried, did not work:* `noStore()` in place of `dynamic =
+"force-dynamic"`; removing the `Suspense` boundary from the guest layout. Do not
+re-try these.
+
+*Why we accept it:* every fix trades away either consent gating or seat
+freshness, both of which matter more. It is link-checker and SEO hygiene, not a
+guest-facing or money-path issue — the guest sees the right page either way.
+Next.js already injects `<meta name="robots" content="noindex">`, so search
+engines are handled; only uptime monitors and link checkers see the 200.
+
+*Revisit if:* a Next.js upgrade changes streaming status behaviour, or the
+consent gate moves out of the layout (e.g. into middleware).

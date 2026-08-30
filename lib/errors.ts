@@ -92,6 +92,19 @@ export const AppError = {
         "That trip does not exist.",
         "expected",
       ),
+      LOAD_FAILED: define(
+        "TRIP.DETAILS.LOAD_FAILED",
+        "Could not load this trip.",
+        "unexpected",
+      ),
+      // PRD_Phase1.md Screen 2 — the trip filled between page load and click.
+      // Expected, not exceptional: two guests looking at the last seats is the
+      // normal case this system is designed around (context.md §5).
+      SOLD_OUT: define(
+        "TRIP.DETAILS.SOLD_OUT",
+        "This trip just sold out.",
+        "expected",
+      ),
     },
   },
 

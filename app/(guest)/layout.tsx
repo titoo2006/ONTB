@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { ConsentScripts } from "@/components/consent/ConsentScripts";
 import { PageViewTracker } from "@/components/consent/PageViewTracker";
@@ -24,11 +23,11 @@ export default function GuestLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <ConsentScripts />
-      {/* useSearchParams needs a Suspense boundary or the route opts out of
-          static rendering entirely. */}
-      <Suspense fallback={null}>
-        <PageViewTracker />
-      </Suspense>
+      {/* No Suspense boundary here, deliberately. Wrapping this in Suspense made
+          every guest response a streamed one, which commits the HTTP status
+          before rendering finishes — notFound() then returned the 404 page with
+          a 200. PageViewTracker tracks pathname only so it needs no boundary. */}
+      <PageViewTracker />
 
       <div className="flex-1">{children}</div>
 

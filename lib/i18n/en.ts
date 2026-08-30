@@ -86,7 +86,46 @@ export const en = {
       "Something went wrong at our end. Your booking hasn't been affected.",
   },
 
-  tripDetails: {},
+  tripDetails: {
+    backToListing: "All sailings",
+    aboutHeading: "About this cruise",
+    aboutBody:
+      "Two hours on the Nile aboard a 500-guest yacht. Dinner is an open buffet, with live singing and onboard entertainment throughout the cruise.",
+    includedHeading: "What's included",
+    included: [
+      "Two-hour Nile cruise",
+      "Open buffet dinner",
+      "Live singing",
+      "Onboard entertainment",
+    ],
+
+    departureHeading: "Departure",
+    durationLabel: "Duration",
+    durationValue: "2 hours",
+    yachtLabel: "Yacht",
+    priceLabel: "Price",
+
+    guestsLabel: "Guests",
+    guestsHint: (max: number) => `Up to ${max} guests per booking`,
+    totalLabel: "Total",
+    bookNow: "Book now",
+    booking: "Checking availability…",
+
+    soldOutTitle: "This trip just sold out",
+    soldOutBody:
+      "Someone booked the last seats while this page was open. Nothing has been charged.",
+    alternativesHeading: "Other sailings with room for your group",
+    noAlternatives:
+      "No other sailings have room for your group in the next few days.",
+
+    notFoundTitle: "We couldn't find that trip",
+    notFoundBody:
+      "It may have already sailed, or the link may be wrong. Here's everything coming up.",
+
+    errorTitle: "We couldn't load this trip",
+    errorBody:
+      "Something went wrong at our end. Your booking hasn't been affected.",
+  },
 
   checkout: {
     // DESIGN.md §8 / Rule 13 — this disclosure must be legible next to the price,

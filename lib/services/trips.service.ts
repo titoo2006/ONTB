@@ -98,6 +98,174 @@ export async function listUpcomingTrips(
 }
 
 /**
+ * One trip, for Screen 2. Returns null when the id doesn't exist or the trip is
+ * no longer scheduled — the page turns that into a 404 rather than a broken
+ * detail screen (PRD_Phase1.md Screen 2).
+ *
+ * Seat count here is still informational (context.md §5). It is re-read fresh in
+ * `checkSeatsAvailable` at the moment the guest clicks, and re-checked again
+ * inside a transaction at checkout. This read is for display only.
+ */
+export async function getTripInstanceById(
+  tripInstanceId: string,
+): Promise<TripListingItem | null> {
+  const supabase = createSupabaseServerClient();
+
+  const { data: tripRows, error: tripError } = await supabase
+    .from("trip_instances")
+    .select("id, yacht_id, trip_date, departure_time, capacity, seats_booked")
+    .eq("id", tripInstanceId)
+    .eq("status", "scheduled")
+    .limit(1);
+
+  if (tripError) {
+    throw appError(AppError.TRIP.DETAILS.LOAD_FAILED, FILE, "getTripInstanceById");
+  }
+
+  const row = tripRows?.[0];
+  if (!row) return null;
+
+  // A trip that has already sailed is not a detail page, it's a 404. Judged in
+  // Cairo (context.md §5.1), never against the visitor's clock.
+  if (!isFutureInCairo(row.trip_date, row.departure_time)) return null;
+
+  const { data: yachtRows, error: yachtError } = await supabase
+    .from("yachts")
+    .select("id, name, image_url")
+    .eq("id", row.yacht_id)
+    .limit(1);
+
+  if (yachtError) {
+    throw appError(AppError.TRIP.DETAILS.LOAD_FAILED, FILE, "getTripInstanceById");
+  }
+
+  const yacht = yachtRows?.[0];
+  if (!yacht) return null;
+
+  return {
+    id: row.id,
+    yachtName: yacht.name,
+    yachtImageUrl: yacht.image_url,
+    tripDate: row.trip_date,
+    departureTime: row.departure_time,
+    capacity: row.capacity,
+    seatsRemaining: Math.max(0, row.capacity - row.seats_booked),
+    pricePerGuestUsdCents: GUEST_PRICE_USD_CENTS,
+  };
+}
+
+/**
+ * Re-read a trip's seat count at the instant the guest clicks "Book now".
+ *
+ * PRD_Phase1.md Screen 2 requires blocking navigation when a trip filled between
+ * page load and click. A listing page can sit open for minutes; this closes that
+ * window before the guest is sent to checkout with a doomed booking.
+ *
+ * This is NOT the authoritative check. It is a fresh read, not a transaction, so
+ * two guests can still both pass it. The check that actually prevents overselling
+ * happens inside the checkout transaction (context.md §5), backed by the
+ * `trip_instance_not_oversold` constraint. This exists to make the common case a
+ * clean message instead of a failure three screens later.
+ */
+export async function checkSeatsAvailable(
+  tripInstanceId: string,
+  headcount: number,
+): Promise<boolean> {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("trip_instances")
+    .select("capacity, seats_booked")
+    .eq("id", tripInstanceId)
+    .eq("status", "scheduled")
+    .limit(1);
+
+  if (error) {
+    throw appError(AppError.TRIP.DETAILS.LOAD_FAILED, FILE, "checkSeatsAvailable");
+  }
+
+  const row = data?.[0];
+  if (!row) return false;
+
+  return row.capacity - row.seats_booked >= headcount;
+}
+
+/**
+ * Other sailings a guest could take instead, for the sold-out case.
+ *
+ * Same Cairo date first — someone who planned tonight most likely still wants
+ * tonight — then the following days. Excludes the trip they were looking at and
+ * anything without room for their party.
+ */
+export async function listAlternativeTrips(
+  tripInstanceId: string,
+  tripDate: CairoDate,
+  headcount: number,
+  limit = 3,
+): Promise<TripListingItem[]> {
+  const days = cairoDateRange(tripDate, 3);
+  const lastDay = days[days.length - 1];
+  if (lastDay === undefined) return [];
+
+  const supabase = createSupabaseServerClient();
+
+  const { data: tripRows, error: tripError } = await supabase
+    .from("trip_instances")
+    .select("id, yacht_id, trip_date, departure_time, capacity, seats_booked")
+    .eq("status", "scheduled")
+    .gte("trip_date", tripDate)
+    .lte("trip_date", lastDay)
+    .neq("id", tripInstanceId)
+    .order("trip_date", { ascending: true })
+    .order("departure_time", { ascending: true });
+
+  if (tripError) {
+    throw appError(AppError.TRIP.DETAILS.LOAD_FAILED, FILE, "listAlternativeTrips");
+  }
+  if (!tripRows || tripRows.length === 0) return [];
+
+  const usable = tripRows.filter(
+    (row) =>
+      row.capacity - row.seats_booked >= headcount &&
+      isFutureInCairo(row.trip_date, row.departure_time),
+  );
+  if (usable.length === 0) return [];
+
+  const yachtIds = [...new Set(usable.map((row) => row.yacht_id))];
+  const { data: yachtRows, error: yachtError } = await supabase
+    .from("yachts")
+    .select("id, name, image_url")
+    .in("id", yachtIds);
+
+  if (yachtError) {
+    throw appError(AppError.TRIP.DETAILS.LOAD_FAILED, FILE, "listAlternativeTrips");
+  }
+
+  const yachtsById = new Map(
+    (yachtRows ?? []).map((yacht) => [yacht.id, yacht] as const),
+  );
+
+  const alternatives: TripListingItem[] = [];
+  for (const row of usable) {
+    const yacht = yachtsById.get(row.yacht_id);
+    if (!yacht) continue;
+    alternatives.push({
+      id: row.id,
+      yachtName: yacht.name,
+      yachtImageUrl: yacht.image_url,
+      tripDate: row.trip_date,
+      departureTime: row.departure_time,
+      capacity: row.capacity,
+      seatsRemaining: Math.max(0, row.capacity - row.seats_booked),
+      pricePerGuestUsdCents: GUEST_PRICE_USD_CENTS,
+    });
+    if (alternatives.length >= limit) break;
+  }
+
+  return alternatives;
+}
+
+/**
  * The next Cairo date that still has a departure, used by the empty state's
  * "try another date" shortcut (DESIGN.md §5.5 — never a bare "No results").
  */

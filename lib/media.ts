@@ -30,18 +30,28 @@ export interface HeroImage {
 /**
  * Hero background images, rotated in this order.
  *
- * EMPTY BY DESIGN (2026-08-31). Four candidate files were supplied and rejected:
- * three carried another operator's logos ("Nile Booking", "Nile Maxim", "The
- * Pharaohs Cruising Restaurants") and a competing booking phone number burned
- * into the pixels, plus Arabic text that could never be localised (Rule 13); the
- * fourth was a Cairo skyline with no boat in it. Cropping could not save them —
- * the logos and text sit in the exact middle band a wide crop keeps.
+ * EMPTY BY DESIGN (2026-08-31). Four candidate files were supplied and rejected.
+ *
+ * NOT an ownership problem — corrected 2026-08-31: "Nile Booking", "Nile Maxim"
+ * and "The Pharaohs Cruising Restaurants" are all the CLIENT'S OWN brands, not a
+ * competitor's. They were rejected for two other reasons:
+ *
+ *   1. A booking phone number is burned into the pixels. Putting a manual
+ *      booking channel on the homepage undercuts the entire reason this platform
+ *      exists — a guest who calls instead of booking online is a guest the
+ *      online channel did not convert.
+ *   2. Burned-in Arabic marketing copy can never be localised (Rule 13), for an
+ *      audience that is ~90% foreign tourists.
+ *
+ * A fifth issue applied to one file: it was a Cairo skyline with no boat in it.
+ * And cropping could not rescue any of them — the logos and text sit in the exact
+ * middle band a wide crop keeps.
  *
  * While this array is empty the hero renders its gradient treatment, which is a
  * holding position rather than the design (DESIGN.md §9.1).
  *
  * BEFORE ADDING ANY IMAGE HERE, it must be:
- *   - the client's own two yachts, never another operator's
+ *   - the client's own boats (DESIGN.md §9.1)
  *   - free of logos, phone numbers, and any burned-in text
  *   - licensed for commercial use
  *

@@ -354,6 +354,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      reserve_seats_and_create_booking: {
+        Args: {
+          p_trip_instance_id: string
+          p_booking_code: string
+          p_guest_name: string
+          p_guest_email: string
+          p_guest_phone: string
+          p_nationality: string
+          p_headcount: number
+          p_guest_price_usd_cents: number
+          p_charged_amount_piasters: number
+          p_fx_rate_snapshot_micros: number
+          p_analytics_consent: boolean
+          p_marketing_consent: boolean
+          p_expires_at: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       admin_role: "super_admin" | "staff"

@@ -157,17 +157,22 @@ export const AppError = {
         "The booking details submitted are not valid.",
         "expected",
       ),
+      CREATE_FAILED: define(
+        "BOOKING.CHECKOUT.CREATE_FAILED",
+        "We couldn't create your booking. Nothing has been charged.",
+        "unexpected",
+      ),
       /**
-       * TEMPORARY — the checkout path is complete up to the booking row and
-       * stops here.
+       * TEMPORARY — the checkout path is complete up to the payment handoff and
+       * stops there.
        *
-       * A booking cannot be created without an FX rate: charged_amount_piasters
-       * and fx_rate_snapshot_micros are NOT NULL, and Paymob requires the amount
-       * in piasters at handoff so neither can be deferred to the webhook. There
-       * is no partial insert. Paymob credentials are also outstanding.
+       * Everything up to and including booking creation is implemented and
+       * tested. The remaining blocker is Paymob credentials — without them
+       * createPaymentIntent cannot run, so checkout refuses BEFORE reserving any
+       * seats rather than holding inventory it cannot charge for.
        *
-       * Delete this code once the FX rate source is decided (context.md §8) and
-       * createPendingBooking is implemented.
+       * Delete this code once Paymob credentials are in place and
+       * createPaymentIntent is implemented.
        */
       PAYMENT_UNAVAILABLE: define(
         "BOOKING.CHECKOUT.PAYMENT_UNAVAILABLE",
